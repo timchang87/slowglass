@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/infra
+**/.claude
+docker-compose.prod.yml
+docker-compose.yml
+Dockerfile.**
+.terraform
+.terraform.lock.hcl
+.terraform.tfstate*

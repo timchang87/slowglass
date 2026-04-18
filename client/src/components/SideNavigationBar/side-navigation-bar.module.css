@@ -1,0 +1,13 @@
+.sideNavBar {
+    display: flex;
+    width: 200px;
+    height: 100vh;
+    position: fixed;
+    padding: 24px var(--spacing-2xs, 8px) var(--spacing-sm, 12px) var(--spacing-md, 16px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex-shrink: 0;
+    background-color: var(--color-bg-secondary, #f0f0f0);
+    left: 0;
+}

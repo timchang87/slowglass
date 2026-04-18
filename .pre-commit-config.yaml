@@ -1,0 +1,135 @@
+default_language_version:
+  python: python3.11
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.100.0
+    hooks:
+      - id: terraform_fmt
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+      - id: terraform_validate
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars) $
+
+      - id: terraform_tflint
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+        args:
+          - --args=--only=terraform_deprecated_interpolation
+          - --args=--only=terraform_deprecated_index
+          - --args=--only=terraform_unused_declarations
+          - --args=--only=terraform_comment_syntax
+          - --args=--only=terraform_documented_outputs
+          - --args=--only=terraform_documented_variables
+          - --args=--only=terraform_typed_variables
+          - --args=--only=terraform_module_pinned_source
+          - --args=--only=terraform_naming_convention
+          - --args=--only=terraform_required_version
+          - --args=--only=terraform_required_providers
+          - --args=--only=terraform_standard_module_structure
+          - --args=--only=terraform_workspace_remote
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.2.467
+    hooks:
+      - id: checkov
+        name: Terraform Checkov
+        language_version: python3.11
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+        args:
+          - --framework
+          - terraform
+          - --quiet
+
+  - repo: https://github.com/aquasecurity/tfsec
+    rev: v1.28.14
+    hooks:
+      - id: tfsec
+        name: Terraform Security Scanner
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Terraform Trailing Whitespace
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+      - id: end-of-file-fixer
+        name: Terraform End of File Fixer
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+      - id: check-yaml
+        name: Terraform Check YAML
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+      - id: check-added-large-files
+        name: Terraform Check Added Large Files
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+        args:
+          - --maxkb=1000
+
+      - id: check-case-conflict
+        name: Terraform Check Case Conflict
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+      - id: check-merge-conflict
+        name: Terraform Check Merge Conflict
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.100.0
+    hooks:
+      - id: terraform_docs
+        exclude: (\.terraform/.*|.*\.(yaml|yml)$)
+        files: ^(infra)/.*\.(tf|tfvars)$
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+
+  - repo: local
+    hooks:
+      - id: npm-lint
+        name: Check Linting
+        entry: npm run lint
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: true
+
+      - id: npm-prettier
+        name: Check Prettier
+        entry: npm run format
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: true
+
+      - id: npm-types-check
+        name: Check Types
+        entry: npm run types-check
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: false
+
+      # - id: npm-test
+      #   name: Check Unit Tests
+      #   entry: npm run test
+      #   language: system
+      #   types_or: [javascript, jsx, ts, tsx]
+      #   pass_filenames: true
+
+      # - id: npm-test-staged
+      #   name: Check Unit Tests for Related Files
+      #   entry: npm run test:staged
+      #   language: system
+      #   types_or: [javascript, jsx, ts, tsx]
+      #   pass_filenames: true
