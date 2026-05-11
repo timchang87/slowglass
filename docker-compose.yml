@@ -20,9 +20,11 @@ services:
     depends_on:
       - backend
     ports:
-      - 3000:3000
+      - 8080:8080
     environment:
-      - PROXY_TARGET=https://node:5000
+      - PROXY_TARGET=https://node:3000
+      - DEV_PORT=8080
+      - SERVER_PORT=3000
     command: npm run dev
 
   backend:
@@ -34,14 +36,14 @@ services:
       platforms:
         - 'linux/amd64'
     expose:
-      - '5000'
+      - '3000'
     depends_on:
       - db
     volumes:
       - ./server:/app
       - /app/node_modules/
     env_file:
-      - .env
+      - ./server/.env
     command: npm run dev
 
   db:

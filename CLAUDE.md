@@ -29,7 +29,7 @@ Mental health personal journal blog with analytics features powered by concepts 
 
 - `/server/src`: Express server with MVC architecture and service layer
 - `/client/src`: React components, pages, and logic
-- `/infra`: Terraform IaC
+- `/infra`: AWS CDK IaC
 
 ## Important Notes
 

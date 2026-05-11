@@ -1,8 +1,13 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, '.', '');
+  const devPort = Number(env.DEV_PORT) || 3000;
+  const serverPort = env.SERVER_PORT || 5000;
+
+  return {
   base: '/',
   plugins: [react()],
   test: {
@@ -27,15 +32,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: devPort,
     strictPort: true,
     host: '0.0.0.0',
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       '/api': {
-        target: 'http://node:5000', //this needs to be conditional nod vs localhost same with nginx conf
+        target: `http://node:${serverPort}`,
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api/, ''),
       },
     },
   },
+  };
 });

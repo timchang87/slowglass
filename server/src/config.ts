@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { __dirname } from './utils.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const getEnvVar = (name: string): string => {
   const value = process.env[name];

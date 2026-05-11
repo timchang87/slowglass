@@ -4,6 +4,3 @@ dist
 .gitignore
 .nvmrc
 .dockerignore
-infra
-.terraform
-.terraform.lock.hcl
