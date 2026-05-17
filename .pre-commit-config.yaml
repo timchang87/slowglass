@@ -24,6 +24,13 @@ repos:
         types_or: [javascript, jsx, ts, tsx]
         pass_filenames: false
 
+      - id: cdk-synth
+        name: CDK Synth
+        entry: bash -c 'cd infra && npx cdk synth'
+        language: system
+        files: ^infra/
+        pass_filenames: false
+
       # - id: npm-test
       #   name: Check Unit Tests
       #   entry: npm run test

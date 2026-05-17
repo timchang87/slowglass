@@ -4,7 +4,7 @@
       - This is a significant architectural shift (all of CI/CD, blue/green, and ephemeral
         test environments depend on ECS)
       - Define ECS cluster, task definitions, and services for frontend and backend
-      - Replace EC2 launch templates and ASG in Terraform with ECS equivalents
+      - Replace EC2 launch templates and ASG in CDK with ECS equivalents
       - Update networking module to route ALB traffic to ECS target groups
       - Validate staging deployment end-to-end before proceeding
 
@@ -14,13 +14,13 @@
       - Replace raw pg queries in server/src/db/index.ts with Prisma client
       - Add migration step to CI and deploy pipeline
 
-[ ] 3. Extend Terraform to manage all environments including RDS
+[ ] 3. Extend CDK to manage all environments including RDS
       - Add RDS Postgres resource (currently running DB in Docker on EC2)
       - Apply global seed data on RDS startup
       - Complete production environment in infra/environments/production/
-      - Add test environment configuration (long-lived, stood up with terraform apply
+      - Add test environment configuration (long-lived, stood up with cdk deploy
         before a work session, torn down after — not ephemeral per CI run)
-      - Ensure terraform destroy fully tears down test and prod to reduce cost
+      - Ensure cdk destroy fully tears down test and prod to reduce cost
 
 --- PHASE 2: LOCAL TESTING ---
 
@@ -34,7 +34,7 @@
       - Write component-to-component interaction test examples
 
 [ ] 6. Add DB transaction harness for supertests
-      - Test environment is a long-lived RDS instance stood up via terraform apply
+      - Test environment is a long-lived RDS instance stood up via cdk deploy
         with global seed data — not spun up per run
       - Implement transaction rollback per test for isolation so supertests run fast
         against the already-running DB
@@ -69,7 +69,7 @@
 --- PHASE 4: CACHING, QUEUING & KNOWLEDGE GRAPH ---
 
 [ ] 12. Add Redis for caching on ECS
-       - Provision ElastiCache (Redis) via Terraform
+       - Provision ElastiCache (Redis) via CDK
        - Integrate Redis client in Express server for response caching
        - Cache frequently read data (e.g. journal entries, analytics aggregates)
        - Deploy Redis alongside existing ECS services
@@ -81,7 +81,7 @@
        - Expose job status endpoints from Express server
 
 [ ] 14. Add Redis + FalkorDB + Graphiti for knowledge graph on ECS
-       - Provision FalkorDB (Redis-compatible graph DB) via Terraform or ECS task
+       - Provision FalkorDB (Redis-compatible graph DB) via CDK or ECS task
        - Integrate Graphiti for temporal knowledge graph layer over journal entries
        - Use graph queries to surface relationships between journal entries, themes, and CBT concepts
        - Deploy as a separate ECS service alongside the backend

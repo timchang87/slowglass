@@ -1,12 +1,12 @@
 # Project: Refresh
 
-Mental health personal journal blog with analytics features powered by concepts from psychology and cognitive behavioral therapy. Project tech stack includes TypeScript, React, React Router, Tailwind, Vite, Zod, Zustand, Node.js, Express.js, PostgreSQL, Drizzle ORM, Docker, Terraform, and AWS.
+A GitHub and AWS wrapper to help organizations and their teams track and manage workflows from development to deployment. Project tech stack includes TypeScript, React, React Router, CSS Modules, Vite, Zod, Zustand, Node.js, Express.js, PostgreSQL, Drizzle ORM, Docker, AWS CDK, and AWS.
 
 ## Code Style
 
 - TypeScript strict mode, no `any` types
 - Use named exports, not default exports
-- Tailwind CSS
+- CSS Modules
 
 ## Commands
 
