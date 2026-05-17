@@ -6,7 +6,7 @@ import { AWS_ACCOUNT, AWS_REGION } from '../config';
 const app = new App();
 new CoreInfra(app, 'Staging', {
   env: { account: AWS_ACCOUNT, region: AWS_REGION },
-  envName: 'staging',
+  envName: 'Staging',
 });
 
 Tags.of(app).add('Project', 'slowglass');
