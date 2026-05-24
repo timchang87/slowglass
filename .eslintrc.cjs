@@ -8,16 +8,16 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  ignorePatterns: ['.eslintrc.cjs', '.tf'],
+  ignorePatterns: ['.eslintrc.cjs', '.tf', 'services/core/infra/**'],
   overrides: [
     {
-      files: ['client/**/*.{ts,tsx}', 'server/**/*.{ts,tsx}'],
+      files: ['client/**/*.{ts,tsx}', 'services/**/**/*.{ts,tsx}'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        // Use a function to pick the right tsconfig per file
         project: (filePath) => {
           if (filePath.includes('/client/')) return './client/tsconfig.json';
-          if (filePath.includes('/server/')) return './server/tsconfig.json';
+          if (filePath.includes('/services/core/'))
+            return './services/core/tsconfig.json';
           return null;
         },
         tsconfigRootDir: __dirname,

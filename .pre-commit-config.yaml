@@ -26,9 +26,16 @@ repos:
 
       - id: cdk-synth
         name: CDK Synth
-        entry: bash -c 'cd infra && npx cdk synth'
+        entry: bash -c 'cd services/core/infra && npx cdk synth'
         language: system
-        files: ^infra/
+        files: ^services/core/infra/
+        pass_filenames: false
+
+      - id: cdk-test
+        name: CDK Tests
+        entry: bash -c 'cd services/core/infra && npm test'
+        language: system
+        files: ^services/core/infra/
         pass_filenames: false
 
       # - id: npm-test

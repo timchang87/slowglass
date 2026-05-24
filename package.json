@@ -5,37 +5,30 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "concurrently \"npm test --prefix client\" \"npm test --prefix server\" \"npm test --prefix infra\"",
-    "test:changed": "concurrently \"npm run test:changed --prefix client\" \"npm run test:changed --prefix server\" \"npm run test:changed --prefix infra\"",
-    "test:staged": "concurrently \"cd client && git diff --cached --name-only | grep '^client/' | sed 's|^client/||' | xargs npx vitest related --run\" \"cd server && git diff --cached --name-only | grep '^server/' | sed 's|^server/||' | xargs npx vitest related --run\"",
-    "test:coverage": "concurrently \"npm run test:coverage --prefix client\" \"npm run test:coverage --prefix server\" \"npm run test:infra\"",
+    "test": "npm run test -ws --if-present",
+    "test:changed": "npm run test:changed -ws --if-present",
+    "test:coverage": "npm run test:coverage -ws --if-present",
     "test:e2e": "playwright test",
     "dev": "docker compose up --watch",
-    "client:build": "cd client && npm run build",
-    "server:build": "cd server && npm run build",
-    "build": "concurrently \"npm run client:build\" \"npm run server:build\"",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.+(js|ts|json|tsx|jsx|scss|html)\"",
-    "install-deps": "concurrently \"npm run client:install\" \"npm run server:install\"",
-    "client:install": "cd client && npm install",
-    "server:install": "cd server && npm install",
-    "types-check": "concurrently \"./client/node_modules/.bin/tsc -p client/tsconfig.json --noEmit\" \"./server/node_modules/.bin/tsc -p server/tsconfig.json --noEmit\"",
-    "db:generate": "cd server && npm run db:generate",
-    "db:migrate": "cd server && npm run db:migrate",
-    "db:push": "cd server && npm run db:push",
-    "db:studio": "cd server && npm run db:studio",
-    "db:check": "cd server && npm run db:check",
-    "db:drop": "cd server && npm run db:drop"
+    "types-check": "npm run types-check -ws --if-present"
   },
   "author": "timchang87",
   "license": "ISC",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "eslint-import-resolver-typescript": "^3.10.1",
     "@typescript-eslint/parser": "^7.16.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.32.0",
     "prettier": "^3.3.2"
-  }
+  },
+  "workspaces": [
+    "client",
+    "services/*",
+    "packages/*"
+  ]
 }

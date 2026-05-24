@@ -5,9 +5,10 @@ import { SideNavigationBar } from './components/SideNavigationBar/SideNavigation
 
 const App: FC = () => {
   useEffect(() => {
-    axios.get('/test').then(function (response) {
-      console.log(response);
-    });
+    axios
+      .get('/api/test')
+      .then((response) => response.data)
+      .then((data) => console.log(data));
   }, []);
 
   return (
