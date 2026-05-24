@@ -1,5 +1,8 @@
-node_modules
-dist
-.env
+**/coverage
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/test-results
+**/.DS_Store
 .todo
-.DS_Store
