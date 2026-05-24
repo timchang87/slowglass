@@ -33,7 +33,11 @@ module.exports = {
         ],
         optionalDependencies: false,
         peerDependencies: false,
-        packageDir: [__dirname, path.resolve(__dirname, '../'), path.resolve(__dirname, 'infra')],
+        packageDir: [
+          __dirname,
+          path.resolve(__dirname, '../'),
+          path.resolve(__dirname, 'infra'),
+        ],
       },
     ],
   },

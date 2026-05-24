@@ -8,7 +8,12 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  ignorePatterns: ['.eslintrc.cjs', '.tf', 'services/core/infra/**'],
+  ignorePatterns: [
+    '.eslintrc.cjs',
+    '.tf',
+    'services/core/infra/**',
+    '**/coverage/**',
+  ],
   overrides: [
     {
       files: ['client/**/*.{ts,tsx}', 'services/**/**/*.{ts,tsx}'],
