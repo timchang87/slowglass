@@ -38,16 +38,9 @@ repos:
         files: ^services/core/infra/
         pass_filenames: false
 
-      # - id: npm-test
-      #   name: Check Unit Tests
-      #   entry: npm run test
-      #   language: system
-      #   types_or: [javascript, jsx, ts, tsx]
-      #   pass_filenames: true
-
-      # - id: npm-test-staged
-      #   name: Check Unit Tests for Related Files
-      #   entry: npm run test:staged
-      #   language: system
-      #   types_or: [javascript, jsx, ts, tsx]
-      #   pass_filenames: true
+      - id: npm-test
+        name: Check Unit Tests
+        entry: npm run test:related
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: true
