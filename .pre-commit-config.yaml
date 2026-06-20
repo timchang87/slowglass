@@ -26,21 +26,21 @@ repos:
 
       - id: cdk-synth
         name: CDK Synth
-        entry: bash -c 'cd services/core/infra && npx cdk synth'
+        entry: bash -c 'cd infra && npx cdk synth'
         language: system
-        files: ^services/core/infra/
+        files: ^infra/
         pass_filenames: false
 
       - id: cdk-test
         name: CDK Tests
-        entry: bash -c 'cd services/core/infra && npm test'
+        entry: bash -c 'cd infra && npm run test -- --run'
         language: system
-        files: ^services/core/infra/
+        files: ^infra/
         pass_filenames: false
 
       - id: npm-test
         name: Check Unit Tests
-        entry: npm run test:related
+        entry: npm run test:related --
         language: system
         types_or: [javascript, jsx, ts, tsx]
         pass_filenames: true

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["*.ts"]
+  // "references": [
+  //   { "path": "./client/tsconfig.json" },
+  //   { "path": "./services/core/tsconfig.json" },
+  //   { "path": "./infra/tsconfig.json" }
+  // ]
+}

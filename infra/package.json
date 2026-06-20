@@ -5,6 +5,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "vitest",
+    "test:related": "vitest related --run",
     "synth": "cdk synth",
     "deploy": "cdk deploy"
   },

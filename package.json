@@ -4,9 +4,10 @@
   "description": "Vite, React, Node, Express, TypeScript, SSL, and Docker",
   "main": "index.js",
   "private": true,
+  "type": "module",
   "scripts": {
     "test": "vitest",
-    "test:related": "npm run test:related -ws --if-present",
+    "test:related": "vitest related --run",
     "test:coverage": "npm run test:coverage -ws --if-present",
     "test:e2e": "playwright test",
     "dev": "docker compose up --watch",

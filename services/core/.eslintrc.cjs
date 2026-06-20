@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   env: { es2022: true },
   extends: ['airbnb-typescript/base', '../../.eslintrc.cjs'],
-  ignorePatterns: ['dist', '.eslintrc.cjs', 'infra/**'],
+  ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
@@ -33,11 +33,7 @@ module.exports = {
         ],
         optionalDependencies: false,
         peerDependencies: false,
-        packageDir: [
-          __dirname,
-          path.resolve(__dirname, '../'),
-          path.resolve(__dirname, 'infra'),
-        ],
+        packageDir: [__dirname, path.resolve(__dirname, '../')],
       },
     ],
   },

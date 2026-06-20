@@ -8,23 +8,29 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  ignorePatterns: [
-    '.eslintrc.cjs',
-    '.tf',
-    'services/core/infra/**',
-    '**/coverage/**',
-  ],
+  ignorePatterns: ['.eslintrc.cjs', '.tf', '**/coverage/**'],
   overrides: [
     {
-      files: ['client/**/*.{ts,tsx}', 'services/**/**/*.{ts,tsx}'],
+      files: ['*.ts'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: (filePath) => {
-          if (filePath.includes('/client/')) return './client/tsconfig.json';
-          if (filePath.includes('/services/core/'))
-            return './services/core/tsconfig.json';
-          return null;
-        },
+        project: './tsconfig.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+    {
+      files: ['client/**/*.{ts,tsx}'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './client/tsconfig.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+    {
+      files: ['services/**/*.ts'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './services/core/tsconfig.json',
         tsconfigRootDir: __dirname,
       },
     },
@@ -41,6 +47,18 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: [
+          './tsconfig.json',
+          './client/tsconfig.json',
+          './services/core/tsconfig.json',
+          './infra/tsconfig.json',
+        ],
+      },
+    },
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],

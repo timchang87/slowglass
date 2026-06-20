@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
 
 const AWS_ACCOUNT = process.env.AWS_ACCOUNT;
 const AWS_REGION = process.env.AWS_REGION;
