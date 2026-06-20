@@ -33,7 +33,7 @@ module.exports = {
         ],
         optionalDependencies: false,
         peerDependencies: false,
-        packageDir: [__dirname, path.resolve(__dirname, '../')],
+        packageDir: [__dirname, path.resolve(__dirname, '../../')],
       },
     ],
   },

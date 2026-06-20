@@ -31,3 +31,9 @@ Either all workspaces own their parser config via a workspace-level `.eslintrc.c
 ## 8. `infra/` as a Top-Level Workspace
 
 Infrastructure isn't app code and has its own lifecycle. It should be a peer workspace with separate test gates, deploy pipelines, and CI/CD events — not nested inside a service. Promoting it to top-level makes that boundary explicit.
+
+## 9. ESLint `packageDir` Must Include Root in a Monorepo
+
+The `import/no-extraneous-dependencies` rule uses `packageDir` to know which `package.json` files to check when validating imports. When a package is hoisted to root, the workspace-level `packageDir` must include the root path — otherwise ESLint won't find the dependency and will incorrectly flag it as extraneous.
+
+`__dirname` in a workspace config resolves to the workspace directory. `path.resolve(__dirname, '../')` goes one level up — which in a nested workspace like `services/core/` is `services/`, not the root. Use `path.resolve(__dirname, '../../')` to reach the root. Always pass both the workspace directory and the root to `packageDir` in a monorepo.

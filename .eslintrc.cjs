@@ -19,22 +19,6 @@ module.exports = {
       },
     },
     {
-      files: ['client/**/*.{ts,tsx}'],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        project: './client/tsconfig.json',
-        tsconfigRootDir: __dirname,
-      },
-    },
-    {
-      files: ['services/**/*.ts'],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        project: './services/core/tsconfig.json',
-        tsconfigRootDir: __dirname,
-      },
-    },
-    {
       files: [
         '**/*.test.ts',
         '**/*.spec.ts',
