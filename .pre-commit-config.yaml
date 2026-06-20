@@ -33,14 +33,14 @@ repos:
 
       - id: cdk-test
         name: CDK Tests
-        entry: bash -c 'cd infra && npm run test -- --run'
+        entry: bash -c 'cd infra && npm run test -- --run --coverage'
         language: system
         files: ^infra/
         pass_filenames: false
 
       - id: npm-test
         name: Check Unit Tests
-        entry: npm run test:related --
+        entry: npm run test:related -- --coverage
         language: system
         types_or: [javascript, jsx, ts, tsx]
         pass_filenames: true

@@ -5,5 +5,9 @@ export default defineConfig({
   test: {
     name: { label: 'Infra Tests', color: 'yellow' },
     globals: true,
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'html'],
+    },
   },
 });
