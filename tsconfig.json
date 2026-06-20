@@ -7,9 +7,4 @@
     "esModuleInterop": true
   },
   "include": ["*.ts"]
-  // "references": [
-  //   { "path": "./client/tsconfig.json" },
-  //   { "path": "./services/core/tsconfig.json" },
-  //   { "path": "./infra/tsconfig.json" }
-  // ]
 }
