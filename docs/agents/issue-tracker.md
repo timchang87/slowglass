@@ -24,6 +24,18 @@ A spec becomes an issue in the project titled "Spec: <name>" holding the full te
 
 `get_issue` plus `list_comments`.
 
+## Choosing the base branch: parallel or stacked
+
+Linear's blocking relations decide where a ticket's branch starts; there is no separate label. When picking up a ticket, `get_issue` with `includeRelations: true` and look at `blockedBy`:
+
+- **Every blocker Done or Canceled (or none):** branch from `main` in its own worktree (`npm run worktree -- new <branch>`) and open the PR against `main`. This is parallel work.
+- **One blocker still open:** stack on it. Branch from the blocker's branch (`npm run worktree -- new <branch> <blocker's branch>`) and open the PR with the blocker's branch as its base. Say so at the top of the PR body ("Stacked on #N"). Once the blocker merges, rebase onto `main` and retarget the PR to `main`.
+- **Several blockers still open:** stack on the one this ticket builds on most directly; if it needs more than one of them, wait until all but one have merged.
+
+Branch names come from the issue's `gitBranchName`, so a blocker's branch is found the same way.
+
+Stacking only helps with dependent work. Two independent tickets that edit the same files will conflict whether or not they are stacked: keep those PRs small, rebase often, and resolve at PR time. Alembic migrations stay linear either way (see `CLAUDE.md`).
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
