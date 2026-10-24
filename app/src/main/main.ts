@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 
 import { SIDECAR_STATUS_CHANNEL, SIDECAR_STATUS_GET } from "../shared/sidecar-status";
@@ -7,6 +8,8 @@ import { SidecarSupervisor } from "./sidecar";
 const DEFAULT_PORT = 47821;
 const port = Number(process.env.SLOWGLASS_PORT ?? DEFAULT_PORT);
 const sidecarDir = process.env.SLOWGLASS_SIDECAR_DIR ?? path.resolve(app.getAppPath(), "..", "sidecar");
+
+const instance = randomUUID();
 
 let window: BrowserWindow | undefined;
 let stopped = false;
@@ -18,9 +21,12 @@ const supervisor = new SidecarSupervisor({
   env: {
     ...process.env,
     SLOWGLASS_PORT: String(port),
+    SLOWGLASS_INSTANCE: instance,
+    SLOWGLASS_PARENT_PID: String(process.pid),
     PATH: [process.env.PATH, "/opt/homebrew/bin", "/usr/local/bin"].filter(Boolean).join(":"),
   },
   port,
+  instance,
   onStatus: (status) => window?.webContents.send(SIDECAR_STATUS_CHANNEL, status),
 });
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import NotRequired, TypedDict
 
 from alembic import command
 from alembic.config import Config
@@ -20,7 +21,13 @@ def open_database(path: Path) -> Engine:
     return create_engine(url)
 
 
-def database_status(engine: Engine) -> dict[str, str | None]:
+class DatabaseStatus(TypedDict):
+    status: str
+    migration: str | None
+    error: NotRequired[str]
+
+
+def database_status(engine: Engine) -> DatabaseStatus:
     try:
         with engine.connect() as connection:
             revision = MigrationContext.configure(connection).get_current_revision()

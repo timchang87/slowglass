@@ -41,3 +41,10 @@ def test_home_and_port_can_be_overridden(monkeypatch: pytest.MonkeyPatch, tmp_pa
     settings = Settings.from_env()
 
     assert (settings.home, settings.port) == (tmp_path, 50123)
+
+
+def test_health_echoes_the_launching_apps_instance_token(tmp_path: Path) -> None:
+    with TestClient(create_app(Settings(home=tmp_path, instance="launch-42"))) as client:
+        health = client.get("/health").json()
+
+    assert health["instance"] == "launch-42"

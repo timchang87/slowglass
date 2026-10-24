@@ -4,6 +4,8 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import type { HealthReport } from "../src/shared/sidecar-status";
+
 export interface LaunchedApp {
   app: ElectronApplication;
   window: Page;
@@ -11,7 +13,7 @@ export interface LaunchedApp {
   home: string;
 }
 
-async function freePort(): Promise<number> {
+export async function freePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = createServer();
     server.once("error", reject);
@@ -24,8 +26,8 @@ async function freePort(): Promise<number> {
 }
 
 /** Launch the built app with its sidecar on a free port and a throwaway home folder. */
-export async function launchApp(): Promise<LaunchedApp> {
-  const port = await freePort();
+export async function launchApp(options: { port?: number } = {}): Promise<LaunchedApp> {
+  const port = options.port ?? (await freePort());
   const home = mkdtempSync(path.join(tmpdir(), "slowglass-e2e-"));
   const app = await electron.launch({
     args: [path.resolve(__dirname, "..")],
@@ -37,7 +39,7 @@ export async function launchApp(): Promise<LaunchedApp> {
 
 export async function sidecarPid(port: number): Promise<number> {
   const response = await fetch(`http://127.0.0.1:${port}/health`);
-  const body = (await response.json()) as { pid: number };
+  const body = (await response.json()) as HealthReport;
   return body.pid;
 }
 

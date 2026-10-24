@@ -42,6 +42,8 @@ Data lives in `~/Music/slowglass/` (the SQLite database is created and migrated 
 | `SLOWGLASS_SIDECAR_DIR` | `../sidecar` from the app | Sidecar project the app launches |
 | `SLOWGLASS_UV` | `uv` | Path to `uv` if it isn't on `PATH` |
 
+The app also sets `SLOWGLASS_INSTANCE` (a per-launch token the sidecar echoes from `/health`, so another process on the port is never mistaken for it) and `SLOWGLASS_PARENT_PID` (the sidecar exits if the app process disappears). Claude's MCP tools are available whenever the sidecar is running; `.mcp.json` assumes the default port.
+
 ## Connect Claude Code
 
 The repo's `.mcp.json` registers the sidecar as an MCP server named `slowglass`:

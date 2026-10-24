@@ -14,6 +14,7 @@
   --text-tertiary: #525252;     /* neutral-600 */
   --text-quaternary: #737373;   /* neutral-500 */
   --text-brand: #1d4ed8;        /* brand-700 */
+  --text-white: #ffffff;        /* text-white (base-white), same in both themes */
   --text-success: #16a34a;      /* green-600 */
   --text-warning: #ca8a04;      /* yellow-600 */
   --text-error: #dc2626;        /* red-600 */

@@ -30,7 +30,7 @@ body {
 .tab:hover { color: var(--text-secondary); background: var(--bg-tertiary); }
 .tab[aria-selected="true"] { color: var(--text-brand); background: var(--bg-brand-primary); }
 @media (prefers-color-scheme: dark) {
-  .tab[aria-selected="true"] { color: #ffffff; }
+  .tab[aria-selected="true"] { color: var(--text-white); }
 }
 .tab:focus-visible { outline: none; box-shadow: var(--ring-brand); }
 

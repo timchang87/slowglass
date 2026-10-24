@@ -1,18 +1,24 @@
 import { type ChildProcess, spawn } from "node:child_process";
 
-import type { SidecarStatus } from "../shared/sidecar-status";
+import { type HealthReport, sameStatus, type SidecarStatus } from "../shared/sidecar-status";
 
 export interface SidecarOptions {
   command: string;
   args: string[];
   env: NodeJS.ProcessEnv;
   port: number;
+  /** Token the sidecar must echo from /health, so another process on the port is never mistaken for it. */
+  instance: string;
   onStatus: (status: SidecarStatus) => void;
 }
 
 const POLL_MS = 500;
 const MAX_BACKOFF_MS = 10_000;
 const STOP_GRACE_MS = 5_000;
+/** A sidecar that was healthy and stops answering for this long is killed and restarted. */
+const HANG_MS = 6_000;
+/** A freshly spawned sidecar that never answers within this long is killed and restarted. */
+const STARTUP_MS = 30_000;
 
 function signalGroup(child: ChildProcess, signal: NodeJS.Signals): void {
   if (child.pid === undefined) return;
@@ -30,12 +36,14 @@ export class SidecarSupervisor {
   private restartTimer: NodeJS.Timeout | undefined;
   private restarts = 0;
   private stopping = false;
-  private current: SidecarStatus = { state: "starting" };
+  private lastStatus: SidecarStatus = { state: "starting" };
+  private lastHealthyAt = 0;
+  private healthySinceSpawn = false;
 
   constructor(private readonly options: SidecarOptions) {}
 
   get status(): SidecarStatus {
-    return this.current;
+    return this.lastStatus;
   }
 
   start(): void {
@@ -66,6 +74,8 @@ export class SidecarSupervisor {
       detached: true,
     });
     this.child = child;
+    this.lastHealthyAt = Date.now();
+    this.healthySinceSpawn = false;
     child.once("error", (error) => this.handleExit(child, `could not start: ${error.message}`));
     child.once("exit", (code, signal) => this.handleExit(child, `exited (${signal ?? code})`));
   }
@@ -82,24 +92,42 @@ export class SidecarSupervisor {
   }
 
   private async checkHealth(): Promise<void> {
-    if (this.child === undefined || this.stopping) return;
+    const child = this.child;
+    if (child === undefined || this.stopping) return;
+    const report = await this.fetchOwnHealth();
+    if (this.stopping || child !== this.child) return;
+    if (report !== undefined) {
+      this.restarts = 0;
+      this.lastHealthyAt = Date.now();
+      this.healthySinceSpawn = true;
+      this.setStatus({ state: "connected", version: report.version, pid: report.pid });
+      return;
+    }
+    const silentFor = Date.now() - this.lastHealthyAt;
+    if (silentFor > (this.healthySinceSpawn ? HANG_MS : STARTUP_MS)) {
+      signalGroup(child, "SIGKILL"); // the exit handler schedules the restart
+    } else if (this.lastStatus.state === "connected") {
+      this.setStatus({ state: "starting", detail: "not responding" });
+    }
+  }
+
+  /** The health report, only if it came from the sidecar this supervisor launched. */
+  private async fetchOwnHealth(): Promise<HealthReport | undefined> {
     try {
       const response = await fetch(`http://127.0.0.1:${this.options.port}/health`, {
         signal: AbortSignal.timeout(1_000),
       });
-      const body = (await response.json()) as { version: string; pid: number };
-      if (this.stopping) return;
-      this.restarts = 0;
-      this.setStatus({ state: "connected", version: body.version, pid: body.pid });
+      if (!response.ok) return undefined;
+      const report = (await response.json()) as HealthReport;
+      return report.instance === this.options.instance ? report : undefined;
     } catch {
-      if (this.current.state === "connected") this.setStatus({ state: "starting", detail: "not responding" });
+      return undefined;
     }
   }
 
   private setStatus(status: SidecarStatus): void {
-    const same =
-      status.state === this.current.state && status.pid === this.current.pid && status.detail === this.current.detail;
-    this.current = status;
-    if (!same) this.options.onStatus(status);
+    const changed = !sameStatus(status, this.lastStatus);
+    this.lastStatus = status;
+    if (changed) this.options.onStatus(status);
   }
 }
