@@ -1,8 +1,0 @@
-node_modules
-dist
-.env
-.todo
-.terraform
-terraform.tfstate*
-*.tfvars
-.DS_Store

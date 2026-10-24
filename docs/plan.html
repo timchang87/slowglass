@@ -1,0 +1,963 @@
+<title>Slowglass Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column with wide bays for diagrams, tables and wireframes; sticky section index on wide screens.
+   Tokens follow the Untitled UI design system (Claude Design project "Untitled UI Design System"): true-neutral grays,
+   blue brand for "the tool shows", amber utility for "you act", red error for "off limits". Inter + Roboto Mono. */
+:root{
+  --ground:#FAFAFA;      /* --bg-secondary (neutral-50) */
+  --panel:#FFFFFF;       /* --bg-primary */
+  --ink:#171717;         /* --text-primary (neutral-900) */
+  --ink-2:#404040;       /* --text-secondary (neutral-700) */
+  --muted:#525252;       /* --text-tertiary (neutral-600) */
+  --rule:#E5E5E5;        /* --border-secondary (neutral-200) */
+  --rule-strong:#D4D4D4; /* --border-primary (neutral-300) */
+  --teal:#2563EB;        /* brand-600: the tool shows */
+  --teal-soft:#EFF6FF;   /* brand-50 */
+  --teal-ink:#1D4ED8;    /* --text-brand (brand-700) */
+  --amber:#B45309;       /* amber-700: you act */
+  --amber-soft:#FFFBEB;  /* amber-50 */
+  --warn:#DC2626;        /* error red-600 */
+  --warn-soft:#FEF2F2;   /* red-50 */
+  --ok:#16A34A;          /* success green-600 */
+  --on-brand:#FFFFFF;
+  --shadow-xs:0 1px 2px rgba(10,10,10,0.05);
+  --shadow-sm:0 1px 3px rgba(10,10,10,0.1), 0 1px 2px -1px rgba(10,10,10,0.1);
+  --ring-brand:0 0 0 4px rgba(37,99,235,0.24);
+  --r-sm:6px; --r-md:8px; --r-xl:12px; --r-full:9999px;
+  --display:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --body:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:"Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --step--1:.8125rem; --step-0:1rem; --step-1:1.125rem; --step-2:1.5rem; --step-3:1.875rem; --step-4:3rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0A0A0A; --panel:#171717; --ink:#FAFAFA; --ink-2:#D4D4D4; --muted:#A3A3A3;
+    --rule:#262626; --rule-strong:#404040;
+    --teal:#3B82F6; --teal-soft:#172554; --teal-ink:#93C5FD;
+    --amber:#FBBF24; --amber-soft:#451A03; --warn:#F87171; --warn-soft:#450A0A; --ok:#4ADE80;
+    --shadow-xs:none; --shadow-sm:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0A0A0A; --panel:#171717; --ink:#FAFAFA; --ink-2:#D4D4D4; --muted:#A3A3A3;
+  --rule:#262626; --rule-strong:#404040;
+  --teal:#3B82F6; --teal-soft:#172554; --teal-ink:#93C5FD;
+  --amber:#FBBF24; --amber-soft:#451A03; --warn:#F87171; --warn-soft:#450A0A; --ok:#4ADE80;
+  --shadow-xs:none; --shadow-sm:none;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:var(--step-0);line-height:1.6;-webkit-font-smoothing:antialiased;padding-inline:20px;padding-block:0 80px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)} nav.toc{display:none}}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:56px;font-size:var(--step--1)}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:s}
+nav.toc a{color:var(--muted);text-decoration:none}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);text-decoration:underline}
+main{min-width:0}
+header.top{padding-block:56px 28px;border-bottom:1px solid var(--rule)}
+.eyebrow{display:inline-block;font-size:var(--step--1);font-weight:500;color:var(--teal-ink);background:var(--teal-soft);border-radius:var(--r-full);padding:2px 10px}
+h1{font-family:var(--display);font-size:var(--step-4);line-height:1.2;margin:.4em 0 .35em;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h2{font-family:var(--display);font-size:var(--step-3);line-height:1.27;margin:0 0 .5em;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h3{font-family:var(--display);font-size:var(--step-1);margin:1.6em 0 .4em;font-weight:600}
+p,li{max-width:68ch}
+.lede{font-size:var(--step-1);color:var(--muted);max-width:60ch}
+section{padding-block:48px 8px;border-bottom:1px solid var(--rule)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+a{color:var(--teal)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;margin:18px 0 0;font-size:var(--step--1);color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.sw.teal{background:var(--teal)} .sw.amber{background:var(--amber)} .sw.warn{background:var(--warn)}
+
+/* decision grid */
+.decisions{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:24px}
+.dec{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-xl);padding:16px;box-shadow:var(--shadow-xs)}
+.dec .k{font-size:var(--step--1);font-weight:600;color:var(--teal-ink)}
+.dec .v{margin-top:4px;font-size:.875rem;line-height:1.43;color:var(--ink-2)}
+
+.principles{display:grid;gap:12px;margin-top:20px;padding:0;list-style:none}
+.principles li{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:12px 0;border-top:1px solid var(--rule);max-width:none}
+.principles b{font-family:var(--display);font-weight:600}
+@media (max-width:560px){.principles li{grid-template-columns:1fr;gap:4px}}
+
+.bay{overflow-x:auto;margin:20px 0;background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-xl);padding:16px;box-shadow:var(--shadow-xs)}
+svg text{font-family:var(--body)}
+svg .box{fill:var(--panel);stroke:var(--rule-strong);stroke-width:1}
+svg .box.side{fill:var(--teal-soft);stroke:var(--teal)}
+svg .box.live{fill:var(--amber-soft);stroke:var(--amber)}
+svg .box.ext{fill:var(--ground);stroke:var(--muted);stroke-dasharray:4 3}
+svg .box.port{fill:var(--panel);stroke:var(--teal);stroke-width:1.6}
+svg .box.later{fill:var(--ground);stroke:var(--muted);stroke-dasharray:5 4}
+svg .frame{fill:none;stroke:var(--teal);stroke-width:1.4}
+svg .t{fill:var(--ink);font-size:13px;font-weight:600}
+svg .s{fill:var(--muted);font-size:11px}
+svg .lbl{fill:var(--teal-ink);font-size:11px;font-family:var(--mono)}
+svg .ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+svg .ln.d{stroke-dasharray:5 4}
+svg .ah{fill:var(--muted)}
+
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font-size:.75rem;font-weight:500;color:var(--muted);background:var(--ground);white-space:nowrap}
+td{max-width:none}
+.tbl{overflow-x:auto;margin:16px 0;background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-xl);box-shadow:var(--shadow-xs)}
+.tbl tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:.75rem;font-weight:500;padding:2px 8px;border-radius:var(--r-full);white-space:nowrap}
+.pill.auto{background:var(--teal-soft);color:var(--teal-ink)}
+.pill.cap{background:var(--amber-soft);color:var(--amber)}
+.pill.ask{background:var(--panel);color:var(--muted);border:1px solid var(--rule)}
+.pill.no{background:var(--warn-soft);color:var(--warn)}
+
+pre.code{font-family:var(--mono);font-size:.8rem;line-height:1.5;background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-xl);box-shadow:var(--shadow-xs);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.cols pre.code{margin:0}
+.cap{font-size:var(--step--1);color:var(--muted);margin:6px 0 0}
+pre.mermaid{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r-xl);padding:16px;overflow-x:auto;margin:16px 0}
+
+/* wireframes */
+.wf{border:1px solid var(--rule);border-radius:var(--r-xl);background:var(--panel);margin:18px 0;overflow:hidden;font-size:.875rem;box-shadow:var(--shadow-sm)}
+.wf-bar{display:flex;align-items:center;gap:4px;padding:8px 12px;border-bottom:1px solid var(--rule);font-size:.875rem;font-weight:600;flex-wrap:wrap;background:var(--panel)}
+.wf-bar .dots{display:flex;gap:6px;margin-right:12px}.wf-bar .dots i{width:10px;height:10px;border-radius:50%;background:var(--rule-strong);display:block}
+.wf-bar .tab{color:var(--muted);padding:6px 10px;border-radius:var(--r-sm)} .wf-bar .tab.on{color:var(--teal-ink);background:var(--teal-soft)}
+.wf-bar .live{margin-left:auto;color:var(--ok);font-weight:500;font-size:.75rem}
+.wf-body{display:grid;gap:16px;padding:16px;background:var(--ground)}
+.wf-foot{display:flex;flex-wrap:wrap;align-items:center;gap:2px;min-height:26px;padding:0 6px;border-top:1px solid var(--rule);background:var(--panel);font-size:.72rem;color:var(--muted)}
+.wf-foot .fi{padding:3px 8px;border-radius:var(--r-sm);white-space:nowrap}
+.wf-foot .fi b{color:var(--ink);font-weight:600}
+.wf-foot .fi.ok{color:var(--ok)}
+.wf-foot .sp{flex:1}
+.menu{border:1px solid var(--rule);border-radius:var(--r-md);background:var(--panel);box-shadow:var(--shadow-sm);padding:4px;max-width:340px}
+.menu .mi{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;border-radius:var(--r-sm);font-size:.875rem}
+.menu .mi.on{background:var(--teal-soft);color:var(--teal-ink);font-weight:600}
+.menu .mi small{color:var(--muted)}
+.menu .sep{height:1px;background:var(--rule);margin:4px 0}
+.subtabs{display:flex;border-bottom:1px solid var(--rule);margin:-16px -16px 12px}
+.subtabs span{flex:1;text-align:center;padding:10px;font-size:.875rem;font-weight:600;color:var(--muted)}
+.subtabs span.on{color:var(--teal-ink);box-shadow:inset 0 -2px 0 var(--teal)}
+.guard{border:1px solid var(--amber);background:var(--amber-soft);border-radius:var(--r-md);padding:10px 12px;font-size:.875rem;margin-top:8px}
+.wf-row{display:grid;gap:12px}
+.blk{border:1px solid var(--rule);border-radius:var(--r-xl);padding:16px;min-width:0;background:var(--panel);box-shadow:var(--shadow-xs)}
+.blk h4{margin:0 0 8px;font-size:.875rem;color:var(--ink);font-weight:600}
+.blk.act{border-color:var(--amber);background:var(--amber-soft)}
+.blk.show{border-color:var(--rule)}
+.blk.show h4::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:8px;vertical-align:1px}
+.blk.act h4::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:8px;vertical-align:1px}
+.line{height:8px;border-radius:var(--r-full);background:var(--rule);margin:6px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.75rem;font-weight:500;border:1px solid var(--rule);border-radius:var(--r-full);padding:2px 8px;background:var(--ground);color:var(--ink-2)}
+.chip.t{border-color:transparent;background:var(--teal-soft);color:var(--teal-ink)}
+.btn{display:inline-block;font-size:.875rem;font-weight:600;border:1px solid var(--rule-strong);border-radius:var(--r-md);padding:7px 13px;margin-top:8px;background:var(--panel);color:var(--ink-2);box-shadow:var(--shadow-xs)}
+.btn.amber{border-color:var(--teal);background:var(--teal);color:var(--on-brand)}
+.listrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.listrow:last-child{border-bottom:0}
+.listrow small{color:var(--muted);display:block}
+.arr{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:6px}
+.arr div{height:24px;border-radius:var(--r-sm);font-size:.68rem;font-weight:500;display:flex;align-items:center;justify-content:center;color:var(--ink);background:var(--rule)}
+.arr .b{background:var(--teal-soft)} .arr .d{background:var(--teal);color:var(--on-brand)} .arr .br{background:var(--amber-soft)}
+.field{border:0;box-shadow:inset 0 0 0 1px var(--rule-strong), var(--shadow-xs);border-radius:var(--r-md);padding:8px 12px;color:var(--ink);margin-top:4px;background:var(--panel)}
+.ladder{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.ladder span{font-size:.75rem;font-weight:500;padding:2px 10px;border-radius:var(--r-full);border:1px solid var(--rule);color:var(--ink-2)}
+.ladder span.on{background:var(--teal);color:var(--on-brand);border-color:var(--teal)}
+.ladder span.lock{color:var(--muted);border-style:dashed}
+.meter{display:flex;gap:4px;align-items:flex-end;height:60px}
+.meter i{flex:1;background:var(--teal);opacity:.75;border-radius:2px 2px 0 0;display:block}
+.graph{font-family:var(--mono);font-size:.75rem;line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+.wf-note{font-size:var(--step--1);color:var(--muted);margin:-8px 0 22px}
+
+/* skill status */
+.track{display:flex;flex-wrap:wrap;gap:0;margin:16px 0;font-size:.8rem}
+.track div{padding:12px 16px;border:1px solid var(--rule);background:var(--panel);margin-right:-1px;flex:1 1 140px}
+.track div:first-child{border-radius:var(--r-xl) 0 0 var(--r-xl)} .track div:last-child{border-radius:0 var(--r-xl) var(--r-xl) 0}
+.track div b{display:block;font-family:var(--display);font-weight:600;font-size:1rem}
+.track div small{color:var(--muted)}
+.track div:last-child{background:var(--teal-soft);border-color:var(--teal)}
+
+/* roadmap */
+.weeks{display:grid;gap:0;margin:16px 0;border-top:1px solid var(--rule)}
+.wk{display:grid;grid-template-columns:90px 1fr 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.wk .n{font-family:var(--mono);font-size:var(--step--1);color:var(--muted)}
+.wk .b,.wk .m{font-size:.92rem;max-width:none}
+.wk .m{color:var(--amber)}
+.wk.head .b,.wk.head .m{font-size:.75rem;font-weight:500;color:var(--muted)}
+@media (max-width:640px){.wk{grid-template-columns:1fr;gap:4px}}
+.risk td:first-child{white-space:nowrap}
+:focus-visible{outline:none;box-shadow:var(--ring-brand);border-radius:var(--r-sm)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sections">
+  <ol>
+    <li><a href="#decisions">Decisions</a></li>
+    <li><a href="#principles">Principles</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#flows">Key flows</a></li>
+    <li><a href="#erd">ERD</a></li>
+    <li><a href="#models">Data models</a></li>
+    <li><a href="#sources">Source registry</a></li>
+    <li><a href="#tooling">Tooling</a></li>
+    <li><a href="#ui">UI / UX wireframes</a></li>
+    <li><a href="#coach">Coach</a></li>
+    <li><a href="#skills">Skill model</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#risks">Risks &amp; open questions</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">slowglass · plan v2 · 18 Oct 2026</div>
+  <h1>A studio that shows, so you can act</h1>
+  <p class="lede">A desktop tool for relearning the whole production chain (arrangement, sound design, mixing, mastering) in Ableton Live 12 Lite, starting with house. It finds reference material, analyses it, mirrors your own set back to you, versions your ideas, and teaches through hints rather than answers.</p>
+  <div class="legend">
+    <span><i class="sw teal"></i>The tool shows (analysis, visuals, discovery)</span>
+    <span><i class="sw amber"></i>You act (knobs, downloads, decisions)</span>
+    <span><i class="sw warn"></i>Off limits</span>
+  </div>
+</header>
+
+<section id="decisions">
+  <h2>Settled decisions</h2>
+  <p>Everything below came out of the grilling session and is fixed until you change it.</p>
+  <div class="decisions">
+    <div class="dec"><div class="k">Goal</div><div class="v">Music first. The tool is a real build too. House/electronic, foundations before artistry.</div></div>
+    <div class="dec"><div class="k">Time</div><div class="v">10 h/week: 6 music, 4 build. Using the tool is your UAT. Music starts in week 1 without the tool.</div></div>
+    <div class="dec"><div class="k">Rig</div><div class="v">Mac mini M4 24 GB · Live 12 Lite (8 tracks, 2 returns) · Sylenth1 + stock · MOTU M2 loopback · near-fields in a bare room.</div></div>
+    <div class="dec"><div class="k">App</div><div class="v">Electron shell + Python sidecar. The sidecar is also an MCP server: Claude Code now, in-app agent later.</div></div>
+    <div class="dec"><div class="k">Live access</div><div class="v">Read-only, behind a <code>LiveBridge</code> seam. Week 1 decides AbletonOSC (vendored) or our own Remote Script.</div></div>
+    <div class="dec"><div class="k">Sources</div><div class="v">Crawl for discovery only where allowed. You always download. Each site has a mode in the source registry.</div></div>
+    <div class="dec"><div class="k">Versioning</div><div class="v">Auto snapshot on save, named snapshots ask for a bounce, branches without merge. Git stores lossless XML through a filter; you read a YAML summary diff. Project and branch live in a thin status footer on every view. Each song gets a private GitHub remote for off-site history.</div></div>
+    <div class="dec"><div class="k">Data</div><div class="v">SQLite for facts, files for things, git per song, audio as plain files. Open-source-ready: links and analysis only.</div></div>
+    <div class="dec"><div class="k">Teaching</div><div class="v">Two loops (study a reference, then your song). Skill tree with evidence. Lessons generated on reach. Ear-drill warm-up. Hint ladder behind problem / tried / hypothesis.</div></div>
+    <div class="dec"><div class="k">Coach runtime</div><div class="v">Rules in Python, words from Claude. Phase 1: <code>/stuck</code> and <code>/lesson</code> in Claude Code over MCP. Phase 2: the same tools in an in-app agent.</div></div>
+    <div class="dec"><div class="k">Browser</div><div class="v">No built-in browser. Links open in your default browser; a Downloads watcher and a bookmarklet bring files and pages back.</div></div>
+  </div>
+</section>
+
+<section id="principles">
+  <h2>Design principles</h2>
+  <ul class="principles">
+    <li><b>Shows, never plays</b><span>The tool never turns a knob, writes a clip, or renders a mix. It draws what is happening and asks questions. Struggle is part of the product.</span></li>
+    <li><b>Hint, not answer</b><span>No hint until you state the problem, what you tried, and what you think it is. The ladder starts at "where" and only reaches "the exact move" on request, and every rung-5 hint is logged against the skill.</span></li>
+    <li><b>You click Download</b><span>Crawlers read listing pages to build the catalogue. Every file download is a human action in a browser. The tool takes over after the file lands.</span></li>
+    <li><b>Facts in the DB, things in files</b><span>SQLite can always be rebuilt from the files plus a re-run of analysis. Nothing irreplaceable lives only in the database.</span></li>
+    <li><b>Seams over bets</b><span><code>LiveBridge</code>, source adapters and the MCP surface are interfaces, so AbletonOSC, a crawl mode or the agent runtime can be swapped without touching the rest.</span></li>
+    <li><b>Evidence over claims</b><span>A skill moves up only on evidence: a passed drill, a diff showing the technique applied, a completed study.</span></li>
+  </ul>
+</section>
+
+<section id="architecture">
+  <h2>Architecture</h2>
+  <p>Everything runs on the Mac mini. The Python sidecar holds all the logic. Electron is the visual surface and Claude reaches the same capabilities through MCP.</p>
+  <div class="bay">
+  <svg viewBox="0 0 1000 600" width="1000" height="600" role="img" aria-label="Architecture diagram: Ableton Live and the MOTU M2 feed a Python sidecar, which serves the Electron app over HTTP and WebSocket, serves Claude over MCP, and stores data in SQLite, song repos and the Learning workspace.">
+    <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
+
+    <!-- left column -->
+    <rect class="box live" x="20" y="24" width="260" height="110" rx="6"/>
+    <text class="t" x="36" y="50">Ableton Live 12 Lite</text>
+    <text class="s" x="36" y="70">Remote Script in User Library</text>
+    <text class="s" x="36" y="86">AbletonOSC (vendored) or slowglass script</text>
+    <text class="s" x="36" y="108">Saves .als into ~/Music/slowglass/projects</text>
+
+    <rect class="box live" x="20" y="160" width="260" height="76" rx="6"/>
+    <text class="t" x="36" y="186">MOTU M2</text>
+    <text class="s" x="36" y="206">Loopback: Live master out → extra inputs</text>
+    <text class="s" x="36" y="222">Monitors + headphones for cross-checks</text>
+
+    <rect class="box ext" x="20" y="474" width="260" height="104" rx="6"/>
+    <text class="t" x="36" y="500">Allowed sources (web)</text>
+    <text class="s" x="36" y="520">Ableton blog · RemiEXS · Beatportal</text>
+    <text class="s" x="36" y="536">EDMProd · PML · Audiotent · Bandcamp</text>
+    <text class="s" x="36" y="552">Freesound API · Cambridge-MT (saved page)</text>
+    <text class="s" x="36" y="568">Honest user-agent, robots.txt obeyed</text>
+
+    <!-- sidecar -->
+    <rect class="box side" x="320" y="24" width="420" height="420" rx="8"/>
+    <text class="t" x="336" y="48">Python sidecar · FastAPI · localhost</text>
+
+    <rect class="box" x="336" y="62" width="186" height="58" rx="5"/>
+    <text class="t" x="348" y="86">LiveBridge</text><text class="s" x="348" y="104">set state, params, meters</text>
+    <rect class="box" x="336" y="130" width="186" height="58" rx="5"/>
+    <text class="t" x="348" y="154">AudioCapture</text><text class="s" x="348" y="172">FFT, LUFS, width, live</text>
+    <rect class="box" x="336" y="198" width="186" height="58" rx="5"/>
+    <text class="t" x="348" y="222">Analysis</text><text class="s" x="348" y="240">sections, tempo, key, tags</text>
+    <rect class="box" x="336" y="266" width="186" height="58" rx="5"/>
+    <text class="t" x="348" y="290">Crawler + Ingest</text><text class="s" x="348" y="308">registry, gists, download watch</text>
+    <rect class="box" x="336" y="364" width="186" height="58" rx="5"/>
+    <text class="t" x="348" y="388">Store</text><text class="s" x="348" y="406">SQLModel · Alembic</text>
+
+    <rect class="box port" x="538" y="62" width="186" height="58" rx="5"/>
+    <text class="t" x="550" y="86">HTTP + WebSocket API</text><text class="s" x="550" y="104">UI data, live streams</text>
+    <rect class="box" x="538" y="130" width="186" height="58" rx="5"/>
+    <text class="t" x="550" y="154">Versioning</text><text class="s" x="550" y="172">watch, als↔xml, git, diff</text>
+    <rect class="box" x="538" y="198" width="186" height="58" rx="5"/>
+    <text class="t" x="550" y="222">Skill tree + evidence</text><text class="s" x="550" y="240">status, prerequisites</text>
+    <rect class="box" x="538" y="266" width="186" height="58" rx="5"/>
+    <text class="t" x="550" y="290">Coach</text><text class="s" x="550" y="308">hint gate, drills, lessons</text>
+    <rect class="box port" x="538" y="364" width="186" height="58" rx="5"/>
+    <text class="t" x="550" y="388">MCP server</text><text class="s" x="550" y="406">tools for Claude</text>
+
+    <!-- right column -->
+    <rect class="box" x="790" y="24" width="190" height="230" rx="6"/>
+    <text class="t" x="806" y="50">Electron app</text>
+    <text class="s" x="806" y="72">main: spawns + supervises sidecar</text>
+    <text class="s" x="806" y="94">renderer (React):</text>
+    <text class="s" x="816" y="112">Catalogue · Study · Studio</text>
+    <text class="s" x="816" y="128">Versions · Lessons · Drills</text>
+    <text class="s" x="806" y="152">opens source pages in your</text>
+    <text class="s" x="806" y="168">default browser</text>
+    <text class="s" x="806" y="192">shows ladder + hint history</text>
+    <text class="s" x="806" y="214">sits beside Live on screen</text>
+
+    <rect class="box" x="790" y="300" width="190" height="66" rx="6"/>
+    <text class="t" x="806" y="326">Claude Code (now)</text>
+    <text class="s" x="806" y="346">MCP client · /stuck · /lesson</text>
+    <rect class="box later" x="790" y="384" width="190" height="66" rx="6"/>
+    <text class="t" x="806" y="410">In-app agent (later)</text>
+    <text class="s" x="806" y="430">Agent SDK, same tools</text>
+
+    <!-- storage -->
+    <rect class="box" x="320" y="490" width="180" height="88" rx="6"/>
+    <text class="t" x="336" y="516">SQLite</text>
+    <text class="s" x="336" y="536">facts: catalogue, analyses,</text>
+    <text class="s" x="336" y="552">versions, skills, hints</text>
+    <rect class="box" x="516" y="490" width="224" height="88" rx="6"/>
+    <text class="t" x="532" y="516">~/Music/slowglass</text>
+    <text class="s" x="532" y="536">projects/ (git repo per song)</text>
+    <text class="s" x="532" y="552">library/ (your downloads, bounces)</text>
+    <text class="s" x="532" y="568">song repos push → private GitHub</text>
+    <rect class="box" x="760" y="490" width="220" height="88" rx="6"/>
+    <text class="t" x="776" y="516">~/Documents/Learning/</text>
+    <text class="t" x="776" y="532">music-production</text>
+    <text class="s" x="776" y="552">lessons, cards, records</text>
+
+    <!-- arrows -->
+    <path class="ln" d="M280,91 L334,91" marker-end="url(#a)" marker-start="url(#a)"/>
+    <text class="lbl" x="284" y="84">OSC/UDP</text>
+    <path class="ln" d="M280,198 L304,198 L304,159 L334,159" marker-end="url(#a)"/>
+    <text class="lbl" x="232" y="252">CoreAudio</text>
+    <path class="ln" d="M150,474 L150,295 L334,295" marker-end="url(#a)"/>
+    <text class="lbl" x="158" y="420">HTTP GET pages</text>
+    <path class="ln" d="M724,91 L788,91" marker-end="url(#a)" marker-start="url(#a)"/>
+    <text class="lbl" x="730" y="84">WS</text>
+    <path class="ln" d="M724,393 L756,393 L756,333 L788,333" marker-end="url(#a)" marker-start="url(#a)"/>
+    <path class="ln d" d="M756,393 L756,417 L788,417" marker-end="url(#a)"/>
+    <text class="lbl" x="742" y="462">MCP stdio</text>
+    <path class="ln" d="M410,444 L410,488" marker-end="url(#a)"/>
+    <path class="ln" d="M628,444 L628,488" marker-end="url(#a)"/>
+    <path class="ln" d="M700,444 L700,466 L870,466 L870,488" marker-end="url(#a)"/>
+  </svg>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Component</th><th>Responsibility</th><th>Interface</th></tr></thead>
+    <tbody>
+      <tr><td><b>LiveBridge</b></td><td>Read tracks, devices, parameters, mixer, arrangement clips, locators, peak meters. Subscribe to changes. Never writes, except an opt-in "create 8-track template" scaffold.</td><td><code>LiveBridge.snapshot()</code>, <code>.subscribe(path)</code>; adapters: <code>AbletonOscBridge</code>, <code>SlowglassScriptBridge</code></td></tr>
+      <tr><td><b>AudioCapture</b></td><td>Read the M2 loopback inputs, compute spectrum, momentary/short-term LUFS, correlation and width at ~20 fps. Compare against a reference bounce.</td><td>WebSocket stream <code>/ws/audio</code></td></tr>
+      <tr><td><b>Analysis</b></td><td>First-pass card from metadata; deep pass from audio and .als: sections, energy curve, tempo, key, stem roles, technique tags, device inventory.</td><td>Job queue; results in <code>analysis</code></td></tr>
+      <tr><td><b>Crawler + Ingest</b></td><td>Per-source adapters that discover entries, write gists and fit scores. Capture comes from a pasted link or the "Send to slowglass" bookmarklet. A watcher on <code>~/Downloads</code> matches new files to the entry you opened (you confirm, or drag the file onto the entry), then unpacks, groups stems into 8 slots, and queues analysis.</td><td><code>SourceAdapter.discover()</code>, <code>.parse(page)</code>, <code>POST /capture</code></td></tr>
+      <tr><td><b>Versioning</b></td><td>Watch project folders, commit to the song's git repo (a clean/smudge filter stores the .als as XML), extract a summary, diff summaries, manage branches and bounces, push each song repo to its private GitHub remote. Owns the current project and branch that every other view reads.</td><td><code>projects()</code>, <code>adopt(path)</code>, <code>snapshot(name?)</code>, <code>changes()</code>, <code>diff(a,b)</code>, <code>restore(v)</code>, <code>branch(name)</code>, <code>switch(branch)</code>, <code>push()</code></td></tr>
+      <tr><td><b>Skill tree + Coach</b></td><td>Skill nodes, prerequisites and status; the hint gate and ladder; drill generation and scoring; lesson generation requests.</td><td>HTTP + MCP tools</td></tr>
+      <tr><td><b>MCP server</b></td><td>Exposes the same capabilities to Claude: <code>live_snapshot</code>, <code>catalogue_search</code>, <code>analysis_get</code>, <code>version_diff</code>, <code>skill_state</code>, <code>coach_context</code>, <code>coach_hint</code>, <code>evidence_add</code>. Read-mostly by design.</td><td>MCP over stdio (Claude Code) or in-process (Agent SDK)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="flows">
+  <h2>Key flows</h2>
+  <h3>Discover, shortlist, download, study</h3>
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Crawler
+  participant S as Allowed source
+  participant DB as SQLite
+  participant U as You (Electron)
+  participant I as Ingest
+  participant A as Analysis
+  C->>S: GET listing pages (honest UA, robots.txt, rate limit)
+  S-->>C: HTML / JSON / feed
+  C->>DB: catalogue_entry (link, stem list, gist, licence)
+  C->>DB: fit score vs your skill state
+  U->>DB: shortlist entry
+  U->>S: "Open source page" opens your default browser; you click Download
+  S-->>U: zip lands in ~/Downloads
+  I->>U: "Is this the contest you opened?" (or drag onto the entry)
+  U->>I: confirm
+  I->>I: move to library, unzip, hash, detect stems / .als / MIDI
+  I->>DB: asset + stem rows, 8-slot grouping
+  I->>A: queue deep analysis
+  A->>DB: sections, energy, technique tags, card
+</pre>
+  <h3>Save in Live, snapshot, diff</h3>
+<pre class="mermaid">
+sequenceDiagram
+  participant L as Live
+  participant W as Watcher
+  participant G as Song git repo
+  participant D as Differ
+  participant UI as Versions view
+  L->>W: Cmd+S writes MySong.als
+  W->>W: debounce 2 s
+  W->>G: git add + commit (clean filter stores MySong.als as XML)
+  W->>D: extract summary.yaml from XML
+  D->>D: compare with parent summary
+  D-->>UI: "Bass: EQ Eight band 1 −3 dB · new track Pad · drop moved +8 bars"
+  UI->>UI: named snapshot? ask you to export a 30 s bounce
+  W->>G: on named snapshot (and hourly): git push to the private GitHub remote
+</pre>
+  <h3>Switch branch</h3>
+<pre class="mermaid">
+sequenceDiagram
+  participant U as You
+  participant UI as Branch menu
+  participant B as LiveBridge
+  participant V as Versioning
+  participant L as Live
+  U->>UI: choose heavier-kick
+  UI->>B: which set is open?
+  B-->>UI: kitchen-groove.als (or unknown)
+  UI-->>U: "Save and close kitchen-groove in Live" (or "Is the set closed?")
+  U->>L: Cmd+S, close the set
+  B-->>UI: no set open
+  UI->>V: switch(heavier-kick)
+  V->>V: auto snapshot if the file changed, then git checkout
+  V->>V: smudge filter rebuilds kitchen-groove.als
+  UI-->>U: switched · "Open in Live"
+  U->>L: open kitchen-groove.als on heavier-kick
+</pre>
+  <h3>Asking for a hint (phase 1, in Claude Code)</h3>
+<pre class="mermaid">
+sequenceDiagram
+  participant U as You
+  participant CC as Claude Code (/stuck)
+  participant T as coach tools (MCP, Python)
+  participant DB as SQLite
+  participant App as Electron app
+  U->>CC: /stuck
+  CC->>U: Problem? What did you try? What do you think it is?
+  U->>CC: three answers
+  CC->>T: coach_context(problem, tried, hypothesis)
+  T->>T: reject if a field is empty or vague
+  T->>DB: open hint_request at rung 1
+  T-->>CC: Live snapshot, audio stats, recent diff, skill state, allowed rung = 1
+  CC-->>U: rung 1 "where", framed against your hypothesis
+  U->>CC: next rung please
+  CC->>T: coach_hint(request_id, rung = 2)
+  T->>DB: log rung 2, allow rung 2 only
+  T-->>CC: context for rung 2
+  CC-->>U: rung 2 "what" (and so on up to 5)
+  DB-->>App: ladder + hint history update live
+  T->>DB: rung 5 on a node holds it at practised
+</pre>
+</pre>
+</section>
+
+<section id="erd">
+  <h2>Entity relationships</h2>
+  <p>Four clusters: <b>discovery</b> (sources to analyses), <b>projects</b> (your songs and their history), <b>learning</b> (skills, evidence, hints, drills) and the links between them. Technique tags are skill nodes, so a reference that teaches sidechaining points at the same node your evidence fills.</p>
+<pre class="mermaid">
+erDiagram
+  SOURCE ||--o{ CRAWL_RUN : runs
+  SOURCE ||--o{ CATALOGUE_ENTRY : lists
+  CATALOGUE_ENTRY ||--o{ ASSET : "downloaded as"
+  ASSET ||--o{ STEM : contains
+  CATALOGUE_ENTRY ||--o{ ANALYSIS : "analysed by"
+  ANALYSIS ||--o{ SECTION : has
+  ANALYSIS ||--o{ ANALYSIS_TAG : tags
+  SKILL_NODE ||--o{ ANALYSIS_TAG : "taught by"
+  SKILL_NODE ||--o{ SKILL_EDGE : requires
+  SKILL_NODE ||--|| SKILL_STATE : status
+  SKILL_NODE ||--o{ EVIDENCE : proves
+  SKILL_NODE ||--o{ LESSON : "taught in"
+  SKILL_NODE ||--o{ HINT_REQUEST : about
+  SKILL_NODE ||--o{ DRILL : trains
+  DRILL ||--o{ DRILL_ATTEMPT : attempts
+  PROJECT ||--o{ BRANCH : has
+  PROJECT ||--o{ VERSION : history
+  BRANCH ||--o{ VERSION : contains
+  VERSION ||--o| VERSION : parent
+  VERSION ||--o{ VERSION_DIFF : from
+  VERSION ||--o{ BOUNCE : "bounced as"
+  VERSION ||--o{ VERSION_PLUGIN : uses
+  PLUGIN ||--o{ VERSION_PLUGIN : "used in"
+  BOUNCE ||--o{ ANALYSIS : "analysed by"
+  PROJECT ||--o{ STUDY_SESSION : "applies"
+  CATALOGUE_ENTRY ||--o{ STUDY_SESSION : "studied in"
+  PROJECT ||--o{ HINT_REQUEST : during
+</pre>
+</section>
+
+<section id="models">
+  <h2>Data models</h2>
+  <p>SQLite schema (SQLModel classes in code, Alembic migrations). JSON columns hold shapes that will keep evolving; anything you filter on gets its own column.</p>
+<pre class="code">-- discovery ---------------------------------------------------------
+source          id, slug, name, base_url, mode TEXT CHECK(mode IN ('automatic','capture','manual','excluded')),
+                adapter, robots_checked_at, tos_url, tos_summary, ai_agents_blocked BOOL,
+                rate_limit_s REAL DEFAULT 5, licence_default, last_reviewed_at, notes
+crawl_run       id, source_id→source, started_at, finished_at, pages_fetched, entries_new,
+                entries_updated, status, error
+catalogue_entry id, source_id→source, url UNIQUE, title, artist, kind TEXT  -- multitrack|stems|live_set|template|midi|one_shots|contest
+                genre, subgenre, bpm REAL, musical_key, published_stems JSON, description,
+                licence, licence_url, price_text, gist, fit_score REAL, fit_reason,
+                status TEXT  -- discovered|shortlisted|downloaded|studied|dismissed
+                deadline_at, discovered_at, updated_at, content_hash
+asset           id, entry_id→catalogue_entry, path, kind TEXT  -- zip|wav|als|mid|stem_mp4
+                bytes, sha256 UNIQUE, added_at
+stem            id, asset_id→asset, name, role TEXT  -- kick|clap|hats|perc|bass|chords|lead|pad|vox|fx
+                slot INT CHECK(slot BETWEEN 1 AND 8), duration_s, peak_db
+
+-- analysis ----------------------------------------------------------
+analysis        id, subject_type TEXT  -- entry|bounce
+                subject_id, depth TEXT  -- first_pass|deep
+                tool_versions JSON, features JSON, card JSON, created_at
+section         id, analysis_id→analysis, label TEXT  -- intro|build|drop|break|outro
+                start_bar, end_bar, start_s, end_s, energy REAL
+analysis_tag    analysis_id→analysis, skill_node_id→skill_node, confidence REAL, evidence TEXT
+
+-- your songs --------------------------------------------------------
+project         id, name, folder_path, repo_path, als_filename, bpm, musical_key, kind TEXT  -- song|study|sketch
+                current_branch_id→branch, remote_url, remote_enabled BOOL, last_pushed_at, last_opened_at, created_at
+branch          id, project_id→project, name, head_version_id→version, created_at, archived BOOL
+version         id, project_id→project, branch_id→branch, parent_id→version, commit_sha,
+                kind TEXT  -- auto|named
+                name, note, live_version, saved_at, summary_path
+version_diff    id, from_version_id→version, to_version_id→version, changes JSON, created_at
+bounce          id, version_id→version, path, start_s, length_s, lufs_i, true_peak_db, created_at
+plugin          id, name, vendor, format, version
+version_plugin  version_id→version, plugin_id→plugin
+
+-- learning ----------------------------------------------------------
+skill_node      id, slug UNIQUE, name, stage TEXT  -- arrangement|sound_design|production|mixing|mastering|listening
+                summary, source_urls JSON
+skill_edge      from_node_id→skill_node, to_node_id→skill_node   -- "to" requires "from"
+skill_state     skill_node_id→skill_node PK, status TEXT  -- unseen|introduced|practised|demonstrated
+                updated_at
+evidence        id, skill_node_id→skill_node, kind TEXT  -- drill|version_diff|study|lesson
+                ref_table, ref_id, note, promotes_to, created_at
+study_session   id, entry_id→catalogue_entry, project_id→project NULL, started_at, ended_at, notes
+lesson          id, skill_node_id→skill_node, path, opened_on TEXT, created_at
+hint_request    id, skill_node_id→skill_node NULL, project_id→project NULL, version_id→version NULL,
+                problem, tried, hypothesis, rung INT CHECK(rung BETWEEN 1 AND 5), response, created_at
+drill           id, skill_node_id→skill_node, kind TEXT  -- eq_band|compression|width|level
+                params JSON
+drill_attempt   id, drill_id→drill, answer JSON, correct BOOL, error REAL, created_at</pre>
+
+  <h3>Versioning format</h3>
+  <p>Two layers, because restoring and reading need different things. Live only opens <code>.als</code>, which is gzipped XML, so the restorable copy must be exactly what Live wrote.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Format</th><th>Where</th><th>Job</th></tr></thead>
+    <tbody>
+      <tr><td>Working file</td><td><code>.als</code> (gzip XML)</td><td>Song folder</td><td>What Live opens and saves. Never touched by the tool.</td></tr>
+      <tr><td>Stored history</td><td>Plain XML</td><td>Song git repo, via a clean/smudge filter</td><td>Lossless restore and branching. Git stores small edits as small deltas, which it cannot do with gzip.</td></tr>
+      <tr><td>Readable summary</td><td>YAML, a few KB</td><td><code>.slowglass/summary.yaml</code> per version</td><td>Diffs and the Versions view. Drops view state, scroll positions and internal IDs that change on every save.</td></tr>
+    </tbody>
+  </table></div>
+<pre class="code"># .gitattributes in each song repo
+*.als  filter=als diff=als
+
+# .git/config (set up by slowglass)
+[filter "als"]
+    clean  = gzip -dc          # .als → XML when committing
+    smudge = gzip -c           # XML → .als on checkout
+    required = true
+[diff "als"]
+    textconv = slowglass summarize --stdin   # git diff shows the YAML summary</pre>
+  <p class="cap">Samples stay out of git (Collect All and Save keeps them in the song folder; your backup covers them). <code>Backup/</code> is ignored.</p>
+  <h3>GitHub remote per song</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>One private repo per song</td><td>Created on "Add existing Ableton project" or "New from template", named <code>slowglass-song-&lt;name&gt;</code>. Always private.</td></tr>
+      <tr><td>What gets pushed</td><td>The XML history (through the filter), <code>.slowglass/summary.yaml</code>, <code>.gitattributes</code>, <code>.gitignore</code>. All branches.</td></tr>
+      <tr><td>What never gets pushed</td><td><code>Samples/</code>, bounces, <code>Backup/</code> and any audio, by <code>.gitignore</code>, plus a pre-push check that refuses audio files and anything over 50 MB.</td></tr>
+      <tr><td>When</td><td>After every named snapshot, and hourly for auto saves. Offline is fine: pushes queue and retry.</td></tr>
+      <tr><td>Song and sketch projects only</td><td>Study projects (built on someone else's Live Set or stems) never get a remote. Pushing them would rehost licensed material.</td></tr>
+      <tr><td>Another Mac</td><td>Clone the repo, restore <code>Samples/</code> from your audio backup, open the <code>.als</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>File shapes</h3>
+  <div class="cols">
+    <div>
+<pre class="code"># projects/kitchen-groove/.slowglass/summary.yaml
+live_version: "12.2"
+tempo: 124.0
+key: F minor
+length_bars: 160
+locators: [{bar: 1, name: Intro}, {bar: 33, name: Build},
+           {bar: 49, name: Drop}, {bar: 81, name: Break}]
+tracks:
+  - name: Kick
+    type: audio
+    mixer: {volume_db: -6.0, pan: 0, sends: [-inf, -inf]}
+    devices:
+      - {class: EqEight, params: {"1 Gain A": -3.0, "1 Frequency A": 45}}
+  - name: Bass
+    type: midi
+    devices:
+      - {class: PluginDevice, plugin: Sylenth1}
+      - {class: Compressor2, params: {Ratio: 4.0, "Sidechain On": true,
+         "Sidechain Source": Kick}}
+clips: {arrangement: 42, session: 6}</pre>
+      <p class="cap">Lossy, normalised and readable. Drives the diff. Restores always use the committed XML.</p>
+    </div>
+    <div>
+<pre class="code"># sources/edmprod.yaml (source registry)
+slug: edmprod
+name: EDMProd free projects
+base_url: https://www.edmprod.com/free/
+mode: automatic
+adapter: wordpress_sitemap
+user_agent: "slowglass/0.1 (+https://github.com/&lt;you&gt;/slowglass)"
+rate_limit_s: 10
+discover: [sitemap_index.xml]
+download: user          # always the user
+gate: email
+licence_default: "Study only; no commercial release of the project"
+tos_url: https://www.edmprod.com/terms/
+tos_summary: "No scraping at scale without permission"
+ai_agents_blocked: false
+last_reviewed_at: 2026-10-18
+review_every_days: 90</pre>
+      <p class="cap">One file per source, committed to the repo. Changing a mode is an edit here, never code.</p>
+    </div>
+  </div>
+<pre class="code">// analysis.card (first pass, before you download anything)
+{
+  "teaches": [{"skill": "sidechain-pumping", "confidence": 0.8, "why": "Bass stem named 'bass_sc'; contest notes mention pumping"},
+              {"skill": "16-bar-build", "confidence": 0.6, "why": "Arrangement notes list 16-bar riser into drop"}],
+  "difficulty_for_you": {"level": "stretch", "missing_prereqs": ["gain-staging"]},
+  "tempo": 124, "key": "A minor", "length": "6:12",
+  "stems": {"published": 14, "grouped_to_8": ["Drums","Perc","Bass","Chords","Lead","Pad","Vox","FX"]},
+  "licence": {"summary": "Remix contest: entry use only", "url": "…"},
+  "preview_url": "…", "source": "remiexs", "gist": "Deep house with a vocal chop hook and a long filtered breakdown."
+}</pre>
+</section>
+
+<section id="sources">
+  <h2>Source registry</h2>
+  <p>Modes: <span class="pill auto">automatic</span> the crawler reads listing pages; <span class="pill cap">capture</span> you browse it in your own browser and paste the link or press the bookmarklet, which saves the link, title and your notes; <span class="pill ask">ask</span> permission email pending; <span class="pill no">excluded</span> not used. Every mode ends the same way: you download the file yourself.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Source</th><th>What</th><th>House fit</th><th>Mode</th><th>How it gets in</th></tr></thead>
+    <tbody>
+      <tr><td>Ableton blog downloads</td><td>~47 artist Live Sets (.als) + samples</td><td>3</td><td><span class="pill auto">automatic</span></td><td>Sitemap; direct CDN zips; educational use. Parse the .als offline, so Suite-only sets can still be studied.</td></tr>
+      <tr><td>EDMProd free</td><td>~8 house/techno Ableton projects</td><td>5</td><td><span class="pill auto">automatic</span></td><td>WordPress sitemap, slow and small; email gate on download</td></tr>
+      <tr><td>Production Music Live</td><td>83 house/techno Ableton projects (paid)</td><td>5</td><td><span class="pill auto">automatic</span></td><td>Shopify <code>products.json</code>; identify the bot as their agents.md asks</td></tr>
+      <tr><td>RemiEXS</td><td>Remix contest aggregator (SKIO, LabelRadar, labels)</td><td>4</td><td><span class="pill auto">automatic</span></td><td>Feeds and calendars. This is how SKIO contests reach you.</td></tr>
+      <tr><td>Beatportal contest articles</td><td>Label remix contests, often with BPM/key</td><td>4</td><td><span class="pill auto">automatic</span></td><td>Sitemap; downloads via LabelRadar</td></tr>
+      <tr><td>Bandcamp tags</td><td><code>stems</code>, <code>remix-stems</code>, <code>remix-pack</code> releases</td><td>3</td><td><span class="pill auto">automatic</span></td><td>The explicitly allowed <code>discover_web</code> endpoint; licence varies per release</td></tr>
+      <tr><td>Audiotent</td><td>Techno project files, free 909 one-shots</td><td>4</td><td><span class="pill auto">automatic</span></td><td>Shopify <code>products.json</code></td></tr>
+      <tr><td>Freesound</td><td>CC one-shots and loops</td><td>3</td><td><span class="pill auto">automatic</span></td><td>APIv2 only (token, 2000/day); scraping is banned</td></tr>
+      <tr><td>Cambridge-MT</td><td>82 electronic multitracks, ~2 house</td><td>2</td><td><span class="pill auto">automatic</span></td><td>Parse a saved copy of the library page; refresh by hand (Cloudflare blocks bots)</td></tr>
+      <tr><td>Groove MIDI, Lakh MIDI</td><td>CC BY drum and song MIDI</td><td>2–3</td><td><span class="pill auto">automatic</span></td><td>One-time static import</td></tr>
+      <tr><td>ADSR, Black Octopus</td><td>House templates, free samples</td><td>3–4</td><td><span class="pill cap">capture</span></td><td>robots.txt blocks AI agents by name. We treat that as applying to us and do not spoof a browser.</td></tr>
+      <tr><td>Traxsource, Juno, Beatport</td><td>Official 4-part STEMS of house releases</td><td>5</td><td><span class="pill cap">capture</span></td><td>Bots blocked. Upgrade to automatic only via Beatport partner API or Juno affiliate feed.</td></tr>
+      <tr><td>Scraps Audio</td><td>229 artist project files, 307 tagged House</td><td>5</td><td><span class="pill ask">ask</span></td><td>ToS bans robots. Capture until artistrelations@ replies.</td></tr>
+      <tr><td>SKIO Music</td><td>Remix contests</td><td>4</td><td><span class="pill ask">ask</span></td><td>ToS bans collecting. Reached through RemiEXS meanwhile.</td></tr>
+      <tr><td>Splice, Loopmasters, Point Blank, Sonic Academy</td><td>Packs, templates, project files</td><td>4</td><td><span class="pill cap">capture</span></td><td>Login, paywall or bot blocks</td></tr>
+      <tr><td>ccMixter</td><td>CC a cappellas and samples</td><td>2</td><td><span class="pill ask">ask</span></td><td>Has an API but robots.txt disallows /api/</td></tr>
+      <tr><td>Reddit, Tracklib, Multitracks.com, Acapellas4U, unclear HF datasets</td><td>various</td><td>–</td><td><span class="pill no">excluded</span></td><td>Disallowed, scraping banned, or licence unknown</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Crawler conduct</h3>
+  <ul>
+    <li>One honest user-agent with a contact URL. No browser spoofing, ever.</li>
+    <li>Obey robots.txt for our agent and for named AI-agent groups (ClaudeBot, GPTBot, anthropic-ai). If those are blocked, the source drops to capture.</li>
+    <li>Listing and detail pages only. No file downloads, no login, no paywalled pages.</li>
+    <li>At least 5 s between requests per host, conditional GETs (ETag), local cache, and a weekly schedule.</li>
+    <li>Store link, metadata and our own gist. Never rehost descriptions in full or any media.</li>
+    <li>Re-check each source's terms every 90 days; the registry records when.</li>
+  </ul>
+</section>
+
+<section id="tooling">
+  <h2>Tooling</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Area</th><th>Tool</th><th>Used for</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Shell</td><td>Electron + Electron Forge</td><td>Desktop window, sidecar process, opening links in your default browser</td><td>MIT</td></tr>
+      <tr><td>UI</td><td>React + TypeScript + Vite</td><td>Renderer views</td><td>MIT</td></tr>
+      <tr><td>Visuals</td><td>Canvas 2D (spectrum), wavesurfer.js (waveforms), uPlot (time series)</td><td>Studio and Study views at 20+ fps</td><td>BSD / MIT</td></tr>
+      <tr><td>Python env</td><td>uv, Python 3.12</td><td>Dependency and venv management</td><td>Fast, lockfile</td></tr>
+      <tr><td>API</td><td>FastAPI + uvicorn</td><td>HTTP and WebSocket endpoints</td><td>MIT / BSD</td></tr>
+      <tr><td>Agent surface</td><td>MCP Python SDK (FastMCP)</td><td>Tools for Claude Code and the later in-app agent</td><td>Later: Claude Agent SDK</td></tr>
+      <tr><td>Storage</td><td>SQLite, SQLModel, Alembic</td><td>Facts, migrations</td><td>Single file DB</td></tr>
+      <tr><td>Live bridge</td><td>AbletonOSC (vendored) + python-osc</td><td>Reading the live set</td><td>MIT. Last commit Nov 2025; week 1 decides.</td></tr>
+      <tr><td>Project files</td><td>gzip + lxml, with dawtool / abletoolz as reference</td><td>.als ↔ XML, summary extraction</td><td>Write our own extractor; use the parsers as prior art</td></tr>
+      <tr><td>Versioning</td><td>git CLI via subprocess, gitattributes clean/smudge filter, watchdog</td><td>Commits, branches, restore; save and Downloads detection</td><td>Plain git keeps repos usable without the app</td></tr>
+      <tr><td>Remote</td><td>GitHub REST API via httpx; token in the macOS Keychain (keyring)</td><td>Create a private repo per song, push branches</td><td>Fine-grained token scoped to repo creation and contents</td></tr>
+      <tr><td>Audio I/O</td><td>sounddevice (PortAudio), soundfile</td><td>M2 loopback capture, reading stems</td><td>MIT / BSD</td></tr>
+      <tr><td>Audio features</td><td>numpy, scipy, librosa, pyloudnorm</td><td>FFT, onsets, tempo, chroma/key, LUFS</td><td>ISC / MIT</td></tr>
+      <tr><td>Structure</td><td>librosa segmentation first; allin1 to evaluate</td><td>Intro / build / drop / break boundaries</td><td>allin1 pulls in madmom, whose models are non-commercial. Check before shipping.</td></tr>
+      <tr><td>Separation</td><td>Demucs (htdemucs) or audio-separator</td><td>Splitting your own tracks (later)</td><td>Check upstream maintenance at build time</td></tr>
+      <tr><td>Crawling</td><td>httpx, selectolax, protego, feedparser</td><td>Fetch, parse HTML, robots.txt rules, feeds</td><td>All permissive</td></tr>
+      <tr><td>LLM</td><td>Claude (Claude Code now)</td><td>Gists, fit reasons, technique tags, lessons, hints</td><td>Analysis numbers come from code, never from the model</td></tr>
+      <tr><td>Testing</td><td>pytest, Playwright for Electron</td><td>Unit and end-to-end</td><td>Fixture .als files from Ableton blog sets</td></tr>
+      <tr><td>In Live</td><td>Stock Lite devices, Sylenth1</td><td>Making music</td><td>More plugins only when a lesson needs one</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="ui">
+  <h2>UI / UX wireframes</h2>
+  <p>Styled with your <b>Untitled UI Design System</b> from Claude Design: Inter, true-neutral grays, blue brand, 12px cards, 8px controls, pill badges. Panels marked with a blue dot are things the tool shows; amber panels are where you act. A thin status footer, like an editor's status bar, carries the current project, branch, saves since the last named snapshot, GitHub push state, and whether Live and the M2 loopback are connected. Clicking the project or branch opens its menu upward.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Screen element</th><th>Untitled UI component</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Project and branch menus</td><td><code>Dropdown</code>, <code>SearchInput</code></td><td>Opened from the status footer</td></tr>
+      <tr><td>Changes / History</td><td><code>Tabs</code></td><td>Inside Versions</td></tr>
+      <tr><td>Top-level views</td><td><code>Tabs</code> (or <code>Sidebar</code> once there are more than six)</td><td>Catalogue · Study · Studio · Versions · Lessons · Drills</td></tr>
+      <tr><td>Panels</td><td><code>Card</code> + <code>CardHeader</code></td><td>Status dot marks "shows" vs "you act"</td></tr>
+      <tr><td>Technique tags, fit, licence</td><td><code>Badge</code>, <code>BadgeGroup</code>, <code>Tag</code></td><td>Brand colour for technique tags</td></tr>
+      <tr><td>Catalogue list and filters</td><td><code>Table</code>, <code>FilterBar</code>, <code>SearchInput</code>, <code>Select</code></td><td>Sort by fit</td></tr>
+      <tr><td>Actions</td><td><code>Button</code> (primary / secondary), <code>ButtonGroup</code></td><td>Primary only for your actions</td></tr>
+      <tr><td>Hint ladder</td><td><code>Steps</code></td><td>Rung 5 shown locked until asked</td></tr>
+      <tr><td>Hint fields (phase 2)</td><td><code>TextArea</code> ×3</td><td>Problem / Tried / Hypothesis</td></tr>
+      <tr><td>Version history</td><td><code>TreeView</code> for branches, <code>ActivityFeed</code> for saves</td><td>Named snapshots as <code>Badge</code></td></tr>
+      <tr><td>Diff rows</td><td><code>Table</code> + <code>TrendIndicator</code></td><td>Up/down for parameter changes</td></tr>
+      <tr><td>Drills</td><td><code>SegmentedControl</code> for answers, <code>ProgressBar</code> for score</td><td></td></tr>
+      <tr><td>Skill status</td><td><code>ProgressCircle</code>, <code>Badge</code></td><td>unseen / introduced / practised / demonstrated</td></tr>
+      <tr><td>Connection, toasts</td><td><code>Dot</code>, <code>Toast</code>, <code>Alert</code></td><td>"Bounce saved", "Live disconnected"</td></tr>
+      <tr><td>Spectrum, meters, arrangement map</td><td>Custom canvas</td><td>The DS has no audio views; use its tokens (<code>--fg-brand</code>, <code>--border-secondary</code>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="wf" role="img" aria-label="Catalogue wireframe">
+    <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab on">Catalogue</span><span class="tab">Study</span><span class="tab">Studio</span><span class="tab">Versions</span><span class="tab">Lessons</span><span class="tab">Drills</span></div>
+    <div class="wf-body">
+      <div class="wf-row" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">
+        <div class="blk">
+          <h4>Filters</h4>
+          <div class="chips"><span class="chip t">teaches: sidechain</span><span class="chip">kind: stems</span><span class="chip">fit: ready</span><span class="chip">120–126 BPM</span></div>
+          <div style="margin-top:10px">
+            <div class="listrow"><div>Deep house vocal chop contest<small>RemiEXS · 14 stems · closes 2 Nov</small></div><span class="chip t">fit 0.82</span></div>
+            <div class="listrow"><div>Classic deep house project<small>EDMProd · Live Set · free</small></div><span class="chip t">fit 0.77</span></div>
+            <div class="listrow"><div>Progressive house multitrack<small>Cambridge-MT · 22 tracks</small></div><span class="chip">fit 0.51</span></div>
+            <div class="listrow"><div>Mathew Jonson Live Set<small>Ableton blog · Suite devices</small></div><span class="chip">stretch</span></div>
+          </div>
+        </div>
+        <div class="blk show">
+          <h4>First-pass card</h4>
+          <b>Deep house vocal chop contest</b>
+          <div class="chips" style="margin-top:6px"><span class="chip t">teaches: sidechain pumping</span><span class="chip t">16-bar build</span><span class="chip t">vocal chops</span></div>
+          <p style="margin:8px 0 4px">Ready for you. Missing prerequisite: gain staging (introduced).</p>
+          <div class="line" style="width:90%"></div><div class="line" style="width:70%"></div>
+          <p style="margin:6px 0 0;color:var(--muted)">124 BPM · A minor · 14 stems → 8 slots · Licence: contest entry only</p>
+          <div class="blk act" style="margin-top:10px"><h4>You</h4>Preview drop ▶ · <span class="btn amber">Shortlist</span> <span class="btn amber">Open source page to download</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-foot"><span class="fi">⎇ <b>kitchen-groove</b> ▴</span><span class="fi"><b>no-pads-drop</b> ▴</span><span class="fi">3 saves since "no-pads"</span><span class="fi">↑ pushed 14:02</span><span class="sp"></span><span class="fi ok">● Live: kitchen-groove.als</span><span class="fi ok">● M2 loopback</span></div>
+  </div>
+  <p class="wf-note">Catalogue. Ranked by fit for you. "Open source page" opens your default browser, where you are already logged in; the tool never downloads.</p>
+
+  <div class="wf" role="img" aria-label="Study wireframe">
+    <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab">Catalogue</span><span class="tab on">Study</span><span class="tab">Studio</span><span class="tab">Versions</span><span class="tab">Lessons</span><span class="tab">Drills</span></div>
+    <div class="wf-body">
+      <div class="blk show">
+        <h4>Arrangement map · 160 bars · energy</h4>
+        <div class="arr"><div class="b">Intro 1–16</div><div class="b">Groove 17–32</div><div class="b">Build 33–48</div><div class="d">Drop 49–64</div><div class="d">Drop 65–80</div><div class="br">Break 81–96</div><div class="d">Drop 97–128</div><div class="b">Outro</div></div>
+        <svg viewBox="0 0 800 40" width="100%" height="40" preserveAspectRatio="none" aria-hidden="true"><path d="M0,34 L100,30 L200,26 L300,14 L320,6 L500,6 L600,26 L620,6 L700,8 L800,34" fill="none" stroke="var(--teal)" stroke-width="2"/></svg>
+      </div>
+      <div class="wf-row" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+        <div class="blk show"><h4>8 slots</h4>1 Kick · 2 Clap/Hats · 3 Perc · 4 Bass · 5 Chords · 6 Vox chop · 7 Pad · 8 FX<br><span class="btn">Export 8-track pack for Lite</span></div>
+        <div class="blk show"><h4>Techniques found</h4><div class="chips"><span class="chip t">sidechain: bass ← kick</span><span class="chip t">HP filter sweep bars 33–48</span><span class="chip t">reverb throw on vox</span></div></div>
+        <div class="blk act"><h4>Your study task</h4>Rebuild the drop's low end with the stems muted one at a time. Write down what the bass does when the kick hits.<div class="field">My notes…</div></div>
+      </div>
+    </div>
+    <div class="wf-foot"><span class="fi">⎇ <b>kitchen-groove</b> ▴</span><span class="fi"><b>no-pads-drop</b> ▴</span><span class="fi">3 saves since "no-pads"</span><span class="fi">↑ pushed 14:02</span><span class="sp"></span><span class="fi ok">● Live: kitchen-groove.als</span><span class="fi ok">● M2 loopback</span></div>
+  </div>
+  <p class="wf-note">Study. Loop one of the two loops: understand how a reference does it, with a concrete task. Lessons link from technique chips.</p>
+
+  <div class="wf" role="img" aria-label="Studio wireframe">
+    <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab">Catalogue</span><span class="tab">Study</span><span class="tab on">Studio</span><span class="tab">Versions</span><span class="tab">Lessons</span><span class="tab">Drills</span></div>
+    <div class="wf-body">
+      <div class="wf-row" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+        <div class="blk show"><h4>Spectrum · your master vs reference (dashed)</h4>
+          <svg viewBox="0 0 500 120" width="100%" height="120" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,70 C40,30 80,28 120,40 S220,60 300,62 S420,80 500,100" fill="none" stroke="var(--teal)" stroke-width="2"/>
+            <path d="M0,60 C40,40 80,42 120,50 S220,58 300,60 S420,78 500,98" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <rect x="40" y="10" width="70" height="100" fill="var(--amber)" opacity=".12"/>
+          </svg>
+          <p style="margin:0;color:var(--muted)">40 Hz · 100 · 1k · 10k &nbsp;|&nbsp; Short-term −9.8 LUFS · ref −8.1 · correlation +0.6</p>
+        </div>
+        <div class="blk show"><h4>Selected track · Bass</h4>
+          <div class="meter"><i style="height:70%"></i><i style="height:55%"></i></div>
+          <p style="margin:6px 0 0">Sylenth1 → EQ Eight (band 1 +2.5 dB @ 80 Hz) → Compressor (sidechain off)</p>
+        </div>
+      </div>
+      <div class="wf-row" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+        <div class="blk show"><h4>Observation (no instructions)</h4>"Your 60–110 Hz region sits 4 dB above the reference during the drop. Kick and bass both boost it." <br><small style="color:var(--muted)">Observations describe; they never prescribe.</small></div>
+        <div class="blk act"><h4>You</h4><span class="btn amber">I'm stuck → ask for a hint</span> <span class="btn amber">Name a snapshot</span></div>
+      </div>
+    </div>
+    <div class="wf-foot"><span class="fi">⎇ <b>kitchen-groove</b> ▴</span><span class="fi"><b>no-pads-drop</b> ▴</span><span class="fi">3 saves since "no-pads"</span><span class="fi">↑ pushed 14:02</span><span class="sp"></span><span class="fi ok">● Live: kitchen-groove.als</span><span class="fi ok">● M2 loopback</span></div>
+  </div>
+  <p class="wf-note">Studio. The mirror while you work in Live: read-only set state plus live audio from the M2 loopback.</p>
+
+  <div class="wf" role="img" aria-label="Versions wireframe">
+    <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab">Catalogue</span><span class="tab">Study</span><span class="tab">Studio</span><span class="tab on">Versions</span><span class="tab">Lessons</span><span class="tab">Drills</span></div>
+    <div class="wf-body">
+      <div class="wf-row" style="grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)">
+        <div class="blk">
+          <div class="subtabs"><span class="on">Changes (3 saves)</span><span>History</span></div>
+          <div class="listrow"><div>Pad removed from Drop, bars 49–80</div><span class="chip">arrangement</span></div>
+          <div class="listrow"><div>Bass · EQ Eight band 1 +2.5 → −1.0 dB</div><span class="chip">mix</span></div>
+          <div class="listrow"><div>Bass · Compressor sidechain from Kick, 4:1</div><span class="chip t">sidechain-pumping</span></div>
+          <div class="blk act" style="margin-top:12px;box-shadow:none"><h4>Name this snapshot</h4>
+            <div class="field">tight-low-end</div>
+            <div class="field" style="color:var(--muted)">Note (optional): sidechain instead of cutting the pad</div>
+            <div style="margin-top:4px;font-size:.8rem;color:var(--amber)">Export a 30 s bounce of the drop first</div>
+            <span class="btn amber" style="display:block;text-align:center">Name snapshot on no-pads-drop</span></div>
+        </div>
+        <div class="blk show"><h4>Diff · "no-pads" → now</h4>
+          <div class="listrow"><div>Pad track removed in Drop (bars 49–80)<small>Arrangement</small></div><span class="chip">−1 clip</span></div>
+          <div class="listrow"><div>Bass · EQ Eight · band 1 gain<small>Mix</small></div><span class="chip">+2.5 → −1.0 dB</span></div>
+          <div class="listrow"><div>Bass · Compressor · sidechain on, source Kick, ratio 4:1<small>Mix · evidence for sidechain-pumping</small></div><span class="chip t">new</span></div>
+          <div class="listrow"><div>Master short-term loudness<small>From bounces</small></div><span class="chip">−9.8 → −9.1 LUFS</span></div>
+          <span class="btn">A/B against "no-pads"</span> <span class="btn">Restore "no-pads"</span>
+        </div>
+      </div>
+    </div>
+    <div class="wf-foot"><span class="fi">⎇ <b>kitchen-groove</b> ▴</span><span class="fi"><b>no-pads-drop</b> ▴</span><span class="fi">3 saves since "no-pads"</span><span class="fi">↑ pushed 14:02</span><span class="sp"></span><span class="fi ok">● Live: kitchen-groove.als</span><span class="fi ok">● M2 loopback</span></div>
+  </div>
+  <p class="wf-note">Versions, Changes tab. Every save is already committed, so "Changes" is everything since the last named snapshot. Naming one works like a commit message. The History tab lists named ◆ snapshots with their auto saves folded underneath, each with a diff and A/B. Restoring adds a new save on top, so nothing is ever lost.</p>
+
+  <div class="wf-row" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="wf" role="img" aria-label="Project menu wireframe">
+      <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab on">Project menu</span></div>
+      <div class="wf-body">
+        <div class="menu">
+          <div class="field" style="margin:0 0 4px">Filter projects</div>
+          <div class="mi on"><span>kitchen-groove</span><small>124 BPM · F min</small></div>
+          <div class="mi"><span>study-cambridge-prog</span><small>study</small></div>
+          <div class="mi"><span>loop-sketches</span><small>3 branches</small></div>
+          <div class="sep"></div>
+          <div class="mi"><span>Add existing Ableton project…</span><small>sets up git + filter</small></div>
+          <div class="mi"><span>New from 8-track Lite template</span><small></small></div>
+          <div class="mi"><span>Show in Finder</span><small></small></div>
+          <div class="mi"><span>View on GitHub</span><small>pushed 14:02</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="wf" role="img" aria-label="Branch menu wireframe">
+      <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab on">Branch menu</span></div>
+      <div class="wf-body">
+        <div class="menu">
+          <div class="mi"><span>main</span><small>"bass-tight" · 2 d</small></div>
+          <div class="mi on"><span>no-pads-drop</span><small>current</small></div>
+          <div class="mi"><span>heavier-kick</span><small>auto · 14:02</small></div>
+          <div class="sep"></div>
+          <div class="mi"><span>New branch from current version…</span><small></small></div>
+          <div class="mi"><span>Rename · Archive</span><small></small></div>
+        </div>
+        <div class="guard"><b>Close kitchen-groove in Live to switch.</b> Your last change is saved as an auto snapshot. After switching, choose "Open in Live".</div>
+        <div><span class="btn">Switch to heavier-kick</span> <span class="btn amber">Open in Live</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="wf-note">Project and branch menus, opened from the status footer. Switching waits until the set is closed in Live, because Live keeps the set in memory and the app cannot swap the file underneath it.</p>
+
+  <div class="wf-row" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="wf" role="img" aria-label="Hint gate wireframe">
+      <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab on">Hint history</span><span class="tab">phase 2: hint form</span></div>
+      <div class="wf-body">
+        <div class="blk show"><h4>From /stuck in Claude Code · 14:20 · skill: low-end</h4><b>Problem</b><div class="field">The drop sounds muddy and small on the monitors</div>
+          <b style="display:block;margin-top:8px">Tried</b><div class="field">Cut 300 Hz on the pad, turned the bass down 2 dB</div>
+          <b style="display:block;margin-top:8px">Hypothesis</b><div class="field">Kick and bass fighting below 100 Hz</div></div>
+        <div class="blk show"><h4>Hint ladder</h4><div class="ladder"><span class="on">1 where</span><span>2 what</span><span>3 concept</span><span>4 example</span><span class="lock">5 move (logged)</span></div>
+          <p style="margin:8px 0 0">"Your hypothesis is aligned. Look at what happens to the bass in the 50 ms after each kick."</p></div>
+      </div>
+    </div>
+    <div class="wf" role="img" aria-label="Drills and lessons wireframe">
+      <div class="wf-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tab on">Drills</span><span class="tab">Lessons</span></div>
+      <div class="wf-body">
+        <div class="blk show"><h4>Warm-up · 8 of 10</h4>Which band is boosted 6 dB on this loop?<div class="chips" style="margin-top:6px"><span class="chip">63</span><span class="chip">125</span><span class="chip">250</span><span class="chip">500</span><span class="chip">1k</span><span class="chip">2k</span><span class="chip">4k</span><span class="chip">8k</span></div><p style="margin:6px 0 0;color:var(--muted)">Weighted to your misses: 250–500 Hz</p></div>
+        <div class="blk show"><h4>Next lesson</h4><b>Sidechain pumping</b><br>Opens on your own diff from today. Skill: introduced → practised.</div>
+      </div>
+    </div>
+  </div>
+  <p class="wf-note">Hint history and Drills. In phase 1 you ask for hints in Claude Code with <code>/stuck</code>; the app shows each request, its ladder position and what was said. In phase 2 the same three fields become a form here.</p>
+</section>
+
+<section id="coach">
+  <h2>Coach</h2>
+  <p>Python enforces the rules and Claude writes the words. Claude can only reach the context for a rung once the tool has logged the rung before it, so the ladder holds even though the model is doing the talking.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>Runs as</th><th>AI</th><th>Phase 1</th><th>Phase 2</th></tr></thead>
+    <tbody>
+      <tr><td>Hint gate: three fields, ladder position, rung limits, logging</td><td>Python, <code>coach_context</code> / <code>coach_hint</code></td><td>No</td><td colspan="2">Same code in both phases</td></tr>
+      <tr><td>Context: Live snapshot, audio stats, skill state, recent diffs</td><td>Python, MCP tools</td><td>No</td><td colspan="2">Same code in both phases</td></tr>
+      <tr><td>Hint wording; checking it against your hypothesis</td><td>Claude</td><td>Yes</td><td><code>/stuck</code> in Claude Code</td><td>Hint form in the app (Agent SDK)</td></tr>
+      <tr><td>Evidence rules, skill status</td><td>Python</td><td>No</td><td colspan="2">Same code in both phases</td></tr>
+      <tr><td>Ear drills: generate audio (band boosts, compression), score answers</td><td>Python (numpy, scipy)</td><td>No</td><td colspan="2">Drills view in the app</td></tr>
+      <tr><td>Lessons: research sources, write five-beat lesson</td><td>Claude</td><td>Yes</td><td><code>/lesson</code> in Claude Code, written to the Learning folder</td><td>Triggered from the app</td></tr>
+      <tr><td>Gists, fit reasons, technique tags</td><td>Claude, over numbers computed in code</td><td>Yes</td><td>Batch job via Claude Code</td><td>In-app agent</td></tr>
+    </tbody>
+  </table></div>
+  <p>Phase 1 runs on your Claude subscription through Claude Code. In phase 1 the app shows the ladder and hint history but doesn't host the form. Phase 2 moves the form into the app with no change to the tools.</p>
+</section>
+
+<section id="skills">
+  <h2>Skill model</h2>
+  <p>Each skill node moves through four states, and only evidence moves it. The tree itself (roughly 40 to 60 nodes across six stages) is a researched build task with primary sources, reviewed by you before the coach is wired to it.</p>
+  <div class="track">
+    <div><b>Unseen</b><small>no contact yet</small></div>
+    <div><b>Introduced</b><small>lesson opened or study task done</small></div>
+    <div><b>Practised</b><small>applied in a version, or drills ≥ 60%</small></div>
+    <div><b>Demonstrated</b><small>applied unprompted in a named version, drills ≥ 80%, no rung-5 hints in the last 3 uses</small></div>
+  </div>
+  <p>Stages: <b>listening</b> (frequency ID, compression, width) · <b>arrangement</b> (sections, builds, transitions, energy) · <b>sound design</b> (subtractive synthesis in Sylenth1, drum layering, sampling) · <b>production</b> (groove, swing, automation, recording guitar) · <b>mixing</b> (gain staging, EQ, compression, sidechain, space, low end) · <b>mastering</b> (loudness, limiting, translation checks). Thresholds above are starting values to tune during UAT.</p>
+</section>
+
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <p>4 build hours and 6 music hours a week. Your "I wish I could see…" list from the music hours re-ranks everything after week 4.</p>
+  <div class="weeks">
+    <div class="wk head"><div class="n">Week</div><div class="b">Build (4 h)</div><div class="m">Music (6 h)</div></div>
+    <div class="wk"><div class="n">1</div><div class="b"><b>Spike:</b> install AbletonOSC in Lite 12, read tracks, devices, params, meters and listeners, and check whether the open set's name or file path is readable (needed for the branch-switch guard). Capture the M2 loopback in Python. Scaffold repo (uv, Electron Forge, FastAPI).</div><div class="m">Set up monitors. Open one Cambridge-MT electronic multitrack in Lite, grouped to 8. Start the wish list.</div></div>
+    <div class="wk"><div class="n">2</div><div class="b">Decide the bridge. Sidecar skeleton, SQLite + first migration, MCP server with <code>live_snapshot</code>. Electron spawns the sidecar.</div><div class="m">Make an 8-bar house loop in stock Lite + Sylenth1.</div></div>
+    <div class="wk"><div class="n">3–4</div><div class="b"><b>Versioning:</b> watcher, git filter for .als, git per song, summary extractor, private GitHub remote and push, diff, named snapshot + bounce prompt, branches, project/branch menus, Versions view.</div><div class="m">Grow the loop into a 32-bar idea. Use branches for two drop ideas.</div></div>
+    <div class="wk"><div class="n">5–7</div><div class="b"><b>Catalogue:</b> source registry and terms check, adapters for Ableton blog, EDMProd, RemiEXS, Beatportal, Bandcamp, PML. Gists and fit. Capture button. Download watcher → ingest → 8-slot grouping → first-pass card. Research the skill tree in parallel.</div><div class="m">First study loop on a contest or EDMProd project. Rough arrangement of your song.</div></div>
+    <div class="wk"><div class="n">8–9</div><div class="b"><b>Studio:</b> live set panel, spectrum and LUFS from the loopback, reference overlay, observations.</div><div class="m"><b>Milestone: first rough finished track.</b> Start mixing it.</div></div>
+    <div class="wk"><div class="n">10–12</div><div class="b"><b>Coach:</b> skill tree in DB, evidence rules, <code>coach_context</code> / <code>coach_hint</code> MCP tools with the ladder enforced, <code>/stuck</code> and <code>/lesson</code> commands for Claude Code, ear drills in Python, ladder view in the app.</div><div class="m">Mix and a first master. Second study loop.</div></div>
+    <div class="wk"><div class="n">Later</div><div class="b">Separate your own tracks into stems (earlier if Study is thin by week 4). In-app agent via Agent SDK. Packaging.</div><div class="m">Artistic references and track 2.</div></div>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>Risks and open questions</h2>
+  <div class="tbl"><table class="risk">
+    <thead><tr><th>Risk</th><th>Why it matters</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>Remote Scripts on Lite 12</td><td>Only Lite 11 reports confirm AbletonOSC works</td><td>Week 1 spike before anything depends on it</td></tr>
+      <tr><td>Pushing the wrong things</td><td>Audio or licensed reference material ending up on GitHub</td><td>.gitignore, pre-push check for audio and large files, no remotes for study projects</td></tr>
+      <tr><td>Open-set detection</td><td>The branch-switch guard needs to know which set Live has open</td><td>Week 1 spike checks it; fallback is asking "Is the set closed?" before switching</td></tr>
+      <tr><td>AbletonOSC stalled</td><td>No merges since Nov 2025; one Live 12 bug open since 2024</td><td>Vendor and pin it behind <code>LiveBridge</code>; own script is a planned fallback</td></tr>
+      <tr><td>.als schema drift</td><td>Live updates can change XML</td><td>Summary extractor tolerates unknown nodes; fixture sets from several Live versions</td></tr>
+      <tr><td>Build eats music time</td><td>The tool becomes the hobby</td><td>Fixed 6/4 split; milestone track at week 8–9 regardless of tool state</td></tr>
+      <tr><td>Thin house study material</td><td>Cambridge-MT has ~2 house tracks</td><td>EDMProd, PML, contests via RemiEXS; pull separation forward if needed</td></tr>
+      <tr><td>Source terms change</td><td>Crawl permission can disappear</td><td>Registry with 90-day reviews; adapters downgrade to capture</td></tr>
+      <tr><td>Model licences</td><td>madmom models are non-commercial; Demucs maintenance uncertain</td><td>Check at build time; librosa-only fallback for sections</td></tr>
+      <tr><td>Bare room</td><td>Monitors misreport 40–120 Hz</td><td>Spectrum vs reference, headphone checks, early monitor-setup lesson</td></tr>
+      <tr><td>Suite-only reference sets</td><td>Lite cannot open or play some Ableton blog sets</td><td>Study them by parsing the .als; use their bounced audio where provided</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Open questions</h3>
+  <ul>
+    <li>Your Lite → Standard upgrade price (shown only after logging in to your Ableton account).</li>
+    <li>Beatport partner API and Juno affiliate access: worth applying?</li>
+    <li>Permission replies from SKIO, Scraps Audio and ccMixter.</li>
+    <li>Whether Rack Macro Variations exist in Lite (affects one sound-design lesson).</li>
+    <li>Repo hosting and licence for the open-source-ready code.</li>
+  </ul>
+</section>
+</main>
+</div>
