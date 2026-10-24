@@ -53,4 +53,4 @@ body {
 .footer .mono { font-family: var(--font-mono); }
 .status-connected { color: var(--text-success); }
 .status-starting, .status-restarting { color: var(--text-warning); }
-.status-stopped { color: var(--text-error); }
+.status-stopped, .status-blocked { color: var(--text-error); }

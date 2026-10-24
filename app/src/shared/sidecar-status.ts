@@ -1,5 +1,5 @@
 /** What the shell knows about its sidecar, pushed from the main process to the window. */
-export type SidecarState = "starting" | "connected" | "restarting" | "stopped";
+export type SidecarState = "starting" | "connected" | "restarting" | "blocked" | "stopped";
 
 export interface SidecarStatus {
   state: SidecarState;

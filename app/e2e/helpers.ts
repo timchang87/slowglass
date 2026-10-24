@@ -25,13 +25,13 @@ export async function freePort(): Promise<number> {
   });
 }
 
-/** Launch the built app with its sidecar on a free port and a throwaway home folder. */
-export async function launchApp(options: { port?: number } = {}): Promise<LaunchedApp> {
+/** Launch the built app with its sidecar on a free port, a throwaway home folder and no checkout label. */
+export async function launchApp(options: { port?: number; env?: NodeJS.ProcessEnv } = {}): Promise<LaunchedApp> {
   const port = options.port ?? (await freePort());
   const home = mkdtempSync(path.join(tmpdir(), "slowglass-e2e-"));
   const app = await electron.launch({
     args: [path.resolve(__dirname, "..")],
-    env: { ...process.env, SLOWGLASS_HOME: home, SLOWGLASS_PORT: String(port) },
+    env: { ...process.env, SLOWGLASS_HOME: home, SLOWGLASS_PORT: String(port), SLOWGLASS_LABEL: "", ...options.env },
   });
   const window = await app.firstWindow();
   return { app, window, port, home };
