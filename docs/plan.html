@@ -348,7 +348,7 @@ pre.mermaid{background:var(--panel);border:1px solid var(--rule);border-radius:v
     <text class="lbl" x="730" y="84">WS</text>
     <path class="ln" d="M724,393 L756,393 L756,333 L788,333" marker-end="url(#a)" marker-start="url(#a)"/>
     <path class="ln d" d="M756,393 L756,417 L788,417" marker-end="url(#a)"/>
-    <text class="lbl" x="742" y="462">MCP stdio</text>
+    <text class="lbl" x="742" y="462">MCP over HTTP</text>
     <path class="ln" d="M410,444 L410,488" marker-end="url(#a)"/>
     <path class="ln" d="M628,444 L628,488" marker-end="url(#a)"/>
     <path class="ln" d="M700,444 L700,466 L870,466 L870,488" marker-end="url(#a)"/>
@@ -364,7 +364,7 @@ pre.mermaid{background:var(--panel);border:1px solid var(--rule);border-radius:v
       <tr><td><b>Crawler + Ingest</b></td><td>Per-source adapters that discover entries, write gists and fit scores. Capture comes from a pasted link or the "Send to slowglass" bookmarklet. A watcher on <code>~/Downloads</code> matches new files to the entry you opened (you confirm, or drag the file onto the entry), then unpacks, groups stems into 8 slots, and queues analysis.</td><td><code>SourceAdapter.discover()</code>, <code>.parse(page)</code>, <code>POST /capture</code></td></tr>
       <tr><td><b>Versioning</b></td><td>Watch project folders, commit to the song's git repo (a clean/smudge filter stores the .als as XML), extract a summary, diff summaries, manage branches and bounces, push each song repo to its private GitHub remote. Owns the current project and branch that every other view reads.</td><td><code>projects()</code>, <code>adopt(path)</code>, <code>snapshot(name?)</code>, <code>changes()</code>, <code>diff(a,b)</code>, <code>restore(v)</code>, <code>branch(name)</code>, <code>switch(branch)</code>, <code>push()</code></td></tr>
       <tr><td><b>Skill tree + Coach</b></td><td>Skill nodes, prerequisites and status; the hint gate and ladder; drill generation and scoring; lesson generation requests.</td><td>HTTP + MCP tools</td></tr>
-      <tr><td><b>MCP server</b></td><td>Exposes the same capabilities to Claude: <code>live_snapshot</code>, <code>catalogue_search</code>, <code>analysis_get</code>, <code>version_diff</code>, <code>skill_state</code>, <code>coach_context</code>, <code>coach_hint</code>, <code>evidence_add</code>. Read-mostly by design.</td><td>MCP over stdio (Claude Code) or in-process (Agent SDK)</td></tr>
+      <tr><td><b>MCP server</b></td><td>Exposes the same capabilities to Claude: <code>live_snapshot</code>, <code>catalogue_search</code>, <code>analysis_get</code>, <code>version_diff</code>, <code>skill_state</code>, <code>coach_context</code>, <code>coach_hint</code>, <code>evidence_add</code>. Read-mostly by design.</td><td>MCP over streamable HTTP at <code>/mcp</code> on the sidecar port (Claude Code), or in-process (Agent SDK). One process owns the database.</td></tr>
     </tbody>
   </table></div>
 </section>
