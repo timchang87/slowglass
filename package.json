@@ -1,0 +1,7 @@
+{
+  "name": "slowglass",
+  "private": true,
+  "scripts": {
+    "worktree": "node scripts/worktree.mjs"
+  }
+}

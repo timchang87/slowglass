@@ -1,4 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
+import { createServer } from "node:net";
 
 import { type HealthReport, sameStatus, type SidecarStatus } from "../shared/sidecar-status";
 
@@ -19,6 +20,15 @@ const STOP_GRACE_MS = 5_000;
 const HANG_MS = 6_000;
 /** A freshly spawned sidecar that never answers within this long is killed and restarted. */
 const STARTUP_MS = 30_000;
+
+/** Whether nothing is listening on the port yet, so the sidecar can bind it. */
+function portIsFree(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = createServer();
+    server.once("error", () => resolve(false));
+    server.listen(port, "127.0.0.1", () => server.close(() => resolve(true)));
+  });
+}
 
 function signalGroup(child: ChildProcess, signal: NodeJS.Signals): void {
   if (child.pid === undefined) return;
@@ -48,7 +58,7 @@ export class SidecarSupervisor {
 
   start(): void {
     this.stopping = false;
-    this.spawnChild();
+    void this.launch();
     this.poll = setInterval(() => void this.checkHealth(), POLL_MS);
   }
 
@@ -64,6 +74,32 @@ export class SidecarSupervisor {
       if ((await Promise.race([exited, timeout])) === "timeout") signalGroup(child, "SIGKILL");
     }
     this.setStatus({ state: "stopped" });
+  }
+
+  /**
+   * Spawn the sidecar, unless another process holds its port. The port is never switched
+   * automatically (Claude's `.mcp.json` points at it), so a busy port is reported and retried.
+   */
+  private async launch(): Promise<void> {
+    const free = await portIsFree(this.options.port);
+    if (this.stopping) return;
+    if (free) {
+      this.spawnChild();
+      return;
+    }
+    this.setStatus({
+      state: "blocked",
+      detail: `port ${this.options.port} is in use by another process; free it or run \`npm run worktree -- setup --repick\``,
+    });
+    this.scheduleLaunch();
+  }
+
+  private scheduleLaunch(): void {
+    const delay = Math.min(1_000 * 2 ** this.restarts, MAX_BACKOFF_MS);
+    this.restarts += 1;
+    this.restartTimer = setTimeout(() => {
+      if (!this.stopping) void this.launch();
+    }, delay);
   }
 
   private spawnChild(): void {
@@ -83,12 +119,8 @@ export class SidecarSupervisor {
   private handleExit(child: ChildProcess, detail: string): void {
     if (this.stopping || child !== this.child) return;
     this.child = undefined;
-    const delay = Math.min(1_000 * 2 ** this.restarts, MAX_BACKOFF_MS);
-    this.restarts += 1;
     this.setStatus({ state: "restarting", detail });
-    this.restartTimer = setTimeout(() => {
-      if (!this.stopping) this.spawnChild();
-    }, delay);
+    this.scheduleLaunch();
   }
 
   private async checkHealth(): Promise<void> {

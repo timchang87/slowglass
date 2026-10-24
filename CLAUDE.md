@@ -7,11 +7,13 @@ Desktop tool for relearning music production in Ableton Live 12 Lite. Electron s
 - `cd sidecar && uv run pytest` / `uv run mypy`: sidecar tests and strict types
 - `cd app && npm run typecheck` / `npm run test:e2e`: shell types and Playwright smoke tests
 - `cd app && npm start`: run the app
+- `npm run worktree -- new <branch>` / `rm <branch>` / `setup [--repick]`: one instance per worktree, each with its own port, data folder and `.mcp.json` (ADR-0001)
 
 ## Conventions
 
 - Test through public interfaces only (sidecar HTTP and MCP, the app window). Test doubles only at outside-world ports.
 - Every sidecar capability is exposed both over HTTP (for the app) and as an MCP tool (for Claude).
+- Migrations stay linear: if your branch's migration and one merged meanwhile share a `down_revision`, point yours at the other (pytest fails on multiple heads).
 - UI uses Untitled UI tokens (`app/src/renderer/tokens.css`); don't invent colours.
 
 ## Agent skills

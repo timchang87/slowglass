@@ -5,3 +5,8 @@ node_modules/
 coverage/
 cdk.out/
 *.tsbuildinfo
+
+# Per checkout, written by scripts/worktree.mjs setup (ADR-0001)
+.mcp.json
+.slowglass/
+.claude/worktrees/

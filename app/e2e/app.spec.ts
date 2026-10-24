@@ -71,7 +71,7 @@ test("the shell follows light and dark with Untitled UI surfaces", async () => {
   }
 });
 
-test("a different process on the sidecar port is not mistaken for the sidecar", async () => {
+test("a different process on the sidecar port blocks the sidecar and says how to repick", async () => {
   const port = await freePort();
   const impostor = createServer((_req, res) => {
     res.setHeader("content-type", "application/json");
@@ -87,7 +87,8 @@ test("a different process on the sidecar port is not mistaken for the sidecar", 
       seen.add((await status.textContent()) ?? "");
       await window.waitForTimeout(100);
     }
-    expect([...seen].some((text) => text.includes("sidecar restarting"))).toBe(true);
+    expect([...seen].some((text) => text.includes(`sidecar blocked: port ${port} is in use`))).toBe(true);
+    expect([...seen].some((text) => text.includes("--repick"))).toBe(true);
     expect([...seen].some((text) => text.includes("sidecar connected"))).toBe(false);
   } finally {
     await app.close();
@@ -121,4 +122,36 @@ test("the sidecar exits if the app process dies without quitting", async () => {
   app.process().kill("SIGKILL");
 
   await expect.poll(() => isAlive(pid), { timeout: 20_000 }).toBe(false);
+});
+
+test("a worktree's label shows in the window title", async () => {
+  const { app, window } = await launchApp({ env: { SLOWGLASS_LABEL: "slo-99-feature" } });
+  try {
+    await window.waitForLoadState("domcontentloaded");
+    const title = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getTitle());
+    expect(title).toBe("Slowglass Studio · slo-99-feature");
+  } finally {
+    await app.close();
+  }
+});
+
+test("without a label the window title is plain", async () => {
+  const { app, window } = await launchApp();
+  try {
+    await window.waitForLoadState("domcontentloaded");
+    const title = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getTitle());
+    expect(title).toBe("Slowglass Studio");
+  } finally {
+    await app.close();
+  }
+});
+
+test("the Electron profile lives in the checkout's home folder", async () => {
+  const { app, home } = await launchApp();
+  try {
+    const userData = await app.evaluate(({ app }) => app.getPath("userData"));
+    expect(userData).toBe(path.join(home, "electron"));
+  } finally {
+    await app.close();
+  }
 });

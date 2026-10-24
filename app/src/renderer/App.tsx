@@ -11,6 +11,8 @@ function statusLabel(status: SidecarStatus): string {
       return "◌ sidecar starting…";
     case "restarting":
       return "◌ sidecar restarting…";
+    case "blocked":
+      return `● sidecar blocked: ${status.detail ?? "port in use"}`;
     case "stopped":
       return "● sidecar stopped";
   }
